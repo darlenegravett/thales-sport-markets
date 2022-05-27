@@ -36,11 +36,14 @@ const MarketsGrid: React.FC<MarketsGridProps> = ({ markets, accountPositions }) 
 
 const Container = styled(FlexDiv)`
     flex-wrap: wrap;
-    max-width: 1220px;
+    max-width: 1700px;
     justify-content: center;
     > div {
         display: flex;
         width: 100%;
+        > div {
+            flex-grow: 1;
+        }
     }
 `;
 

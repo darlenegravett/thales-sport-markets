@@ -1,24 +1,32 @@
 import { Colors } from 'styles/common';
 
 export default {
-    background: { primary: Colors.WHITE, secondary: Colors.PINK_LIGHT, tertiary: Colors.WHITE },
+    background: { primary: Colors.WHITE, secondary: Colors.GRAY_LIGHT, tertiary: Colors.WHITE },
     textColor: {
         primary: Colors.PURPLE,
         secondary: Colors.GREEN,
         tertiary: Colors.WHITE,
     },
+    oddsColor: {
+        primary: Colors.GREEN,
+        secondary: Colors.RED,
+        tertiary: Colors.BLUE,
+    },
     borderColor: {
-        primary: Colors.PURPLE,
-        secondary: Colors.GREEN,
+        primary: Colors.GRAY_LIGHT,
+        secondary: Colors.WHITE,
         tertiary: Colors.PURPLE,
     },
     button: {
         background: {
             primary: Colors.GREEN,
             secondary: Colors.PURPLE,
+            tertiary: Colors.GRAY_LIGHT,
         },
         textColor: {
             primary: Colors.WHITE,
+            secondary: Colors.GRAY_DARK,
+            tertiary: Colors.GRAY,
         },
         borderColor: {
             primary: Colors.WHITE,
@@ -28,15 +36,15 @@ export default {
         background: {
             primary: Colors.WHITE,
             selection: {
-                primary: Colors.PINK_LIGHT,
+                primary: Colors.GRAY_LIGHT,
             },
         },
         textColor: {
             primary: Colors.PURPLE_DARK,
         },
         borderColor: {
-            primary: Colors.PURPLE,
-            secondary: Colors.PURPLE,
+            primary: Colors.GRAY_LIGHT,
+            secondary: Colors.WHITE,
             focus: {
                 primary: Colors.GREEN,
             },
