@@ -43,6 +43,7 @@ import {
     Separator,
     CustomTooltip,
     LabelContainer,
+    FooterContainer,
 } from './styled-components/MarketDetails';
 import { FlexDivCentered } from '../../../../styles/common';
 import { MAX_L2_GAS_LIMIT, Position, Side } from '../../../../constants/options';
@@ -76,6 +77,8 @@ import { getSuccessToastOptions, getErrorToastOptions } from 'config/toast';
 import { useTranslation } from 'react-i18next';
 import WalletInfo from '../WalletInfo';
 import { bigNumberFormmaterWithDecimals } from 'utils/formatters/ethers';
+import { refetchBalances } from 'utils/queryConnector';
+import onboardConnector from 'utils/onboardConnector';
 
 type MarketDetailsProps = {
     market: MarketData;
@@ -262,11 +265,10 @@ const MarketDetails: React.FC<MarketDetailsProps> = ({ market, selectedSide, set
             if (sportsAMMContract && signer) {
                 setIsBuying(true);
                 const sportsAMMContractWithSigner = sportsAMMContract.connect(signer);
-                const ammQuote = await fetchAmmQuote(+amount || 1);
-                const parsedAmount = ethers.utils.parseEther(amount.toString());
+                const ammQuote = await fetchAmmQuote(+Number(amount).toFixed(2) || 1);
+                const parsedAmount = ethers.utils.parseEther(Number(amount).toFixed(2));
                 const id = toast.loading(t('market.toast-messsage.transaction-pending'));
-                console.log('selectedStableIndex ', selectedStableIndex);
-                console.log('parsedAmount ', parsedAmount);
+
                 try {
                     const tx = await getAMMSportsTransaction(
                         selectedSide === Side.BUY,
@@ -284,6 +286,7 @@ const MarketDetails: React.FC<MarketDetailsProps> = ({ market, selectedSide, set
                     const txResult = await tx.wait();
 
                     if (txResult && txResult.transactionHash) {
+                        refetchBalances(walletAddress, networkId);
                         selectedSide === Side.BUY
                             ? toast.update(id, getSuccessToastOptions(t('market.toast-messsage.buy-success')))
                             : toast.update(id, getSuccessToastOptions(t('market.toast-messsage.sell-success')));
@@ -292,6 +295,7 @@ const MarketDetails: React.FC<MarketDetailsProps> = ({ market, selectedSide, set
                     }
                 } catch (e) {
                     setIsBuying(false);
+                    refetchBalances(walletAddress, networkId);
                     toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again')));
                     console.log('Error ', e);
                 }
@@ -339,7 +343,7 @@ const MarketDetails: React.FC<MarketDetailsProps> = ({ market, selectedSide, set
             if (selectedSide === Side.BUY) {
                 const { sportsAMMContract, signer } = networkConnector;
                 if (sportsAMMContract && signer) {
-                    const price = ammPosition.sides[selectedSide].quote / (+amount || 1);
+                    const price = ammPosition.sides[selectedSide].quote / (+Number(amount).toFixed(2) || 1);
                     if (price > 0 && paymentTokenBalance) {
                         let tmpSuggestedAmount = Number(paymentTokenBalance) / Number(price);
                         if (tmpSuggestedAmount > availablePerSide.positions[selectedPosition].available) {
@@ -389,7 +393,9 @@ const MarketDetails: React.FC<MarketDetailsProps> = ({ market, selectedSide, set
                     if (market.finalResult === 0) {
                         toast.update(id, getSuccessToastOptions(t('market.toast-messsage.claim-refund-success')));
                     } else {
+                        toast.update(id, getSuccessToastOptions(t('market.toast-messsage.claim-winnings-success')));
                     }
+                    setClaimable(false);
                 }
             } catch (e) {
                 toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again')));
@@ -405,7 +411,7 @@ const MarketDetails: React.FC<MarketDetailsProps> = ({ market, selectedSide, set
                 return;
             }
 
-            if (!amount || isBuying || isAllowing) {
+            if (!Number(amount) || Number(amount) < 0.1 || isBuying || isAllowing) {
                 setSubmitDisabled(true);
                 return;
             }
@@ -438,6 +444,43 @@ const MarketDetails: React.FC<MarketDetailsProps> = ({ market, selectedSide, set
         setTooltipTextMessage(value);
     };
 
+    const getSubmitButton = () => {
+        if (!isWalletConnected) {
+            return (
+                <SubmitButton disabled={submitDisabled} onClick={() => onboardConnector.connectWallet()}>
+                    {t('common.wallet.connect-your-wallet')}
+                </SubmitButton>
+            );
+        }
+        if (!hasAllowance) {
+            return (
+                <SubmitButton
+                    disabled={submitDisabled}
+                    onClick={async () => {
+                        if (!!amount) {
+                            setOpenApprovalModal(true);
+                        }
+                    }}
+                >
+                    {t('common.wallet.approve')}
+                </SubmitButton>
+            );
+        }
+
+        return (
+            <SubmitButton
+                disabled={submitDisabled}
+                onClick={async () => {
+                    if (!!amount) {
+                        handleSubmit();
+                    }
+                }}
+            >
+                {selectedSide}
+            </SubmitButton>
+        );
+    };
+
     return (
         <MarketContainer>
             <WalletInfo market={market} />
@@ -468,7 +511,7 @@ const MarketDetails: React.FC<MarketDetailsProps> = ({ market, selectedSide, set
 
             {market.gameStarted && (
                 <Status resolved={market.resolved} claimable={claimable}>
-                    {!market.resolved ? 'Started' : claimable ? 'Claimable' : 'Finished'}
+                    {!market.resolved ? 'Pending resolution' : claimable ? 'Claimable' : 'Finished'}
                 </Status>
             )}
             {market.resolved && !market.gameStarted && (
@@ -506,7 +549,7 @@ const MarketDetails: React.FC<MarketDetailsProps> = ({ market, selectedSide, set
                     {market.resolved && market.gameStarted && <ScoreLabel>{market.awayScore}</ScoreLabel>}
                 </MatchInfoColumn>
             </MatchInfo>
-            <MatchDate>{formatDateWithTime(market.maturityDate)}</MatchDate>
+            {market.resolved && !market.gameStarted && <MatchDate>{formatDateWithTime(market.maturityDate)}</MatchDate>}
             {!market.gameStarted && !market.resolved && (
                 <OddsContainer>
                     <Pick
@@ -597,7 +640,9 @@ const MarketDetails: React.FC<MarketDetailsProps> = ({ market, selectedSide, set
                                 <AmountToBuyInput
                                     type="number"
                                     onChange={(e) => {
-                                        setAmount(e.target.value);
+                                        if (Number(e.target.value) >= 0) {
+                                            setAmount(e.target.value);
+                                        }
                                     }}
                                     value={amount}
                                 />
@@ -630,23 +675,8 @@ const MarketDetails: React.FC<MarketDetailsProps> = ({ market, selectedSide, set
                             }}
                         />
                     </SliderContainer>
-                    <FlexDivCentered>
-                        <SubmitButton
-                            disabled={submitDisabled}
-                            onClick={async () => {
-                                if (!!amount) {
-                                    if (hasAllowance) {
-                                        await handleSubmit();
-                                    } else {
-                                        setOpenApprovalModal(true);
-                                    }
-                                }
-                            }}
-                        >
-                            {hasAllowance ? selectedSide : 'APPROVE'}
-                        </SubmitButton>
-                    </FlexDivCentered>
-                    <FlexDivCentered>
+                    <FlexDivCentered>{getSubmitButton()}</FlexDivCentered>
+                    <FooterContainer>
                         <SliderInfo>
                             <SliderInfoTitle>Skew:</SliderInfoTitle>
                             <SliderInfoValue>
@@ -661,7 +691,7 @@ const MarketDetails: React.FC<MarketDetailsProps> = ({ market, selectedSide, set
                                 <SliderInfo>
                                     <SliderInfoTitle>Potential profit:</SliderInfoTitle>
                                     <SliderInfoValue>
-                                        {!amount || positionPriceDetailsQuery.isLoading || !!tooltipText
+                                        {!Number(amount) || positionPriceDetailsQuery.isLoading || !!tooltipText
                                             ? '-'
                                             : `$${formatCurrency(
                                                   Number(amount) - ammPosition.sides[selectedSide].quote
@@ -672,7 +702,7 @@ const MarketDetails: React.FC<MarketDetailsProps> = ({ market, selectedSide, set
                                 </SliderInfo>
                             </>
                         )}
-                    </FlexDivCentered>
+                    </FooterContainer>
                     <StatusSourceContainer>
                         <StatusSourceInfo />
                         <StatusSourceInfo />
@@ -690,7 +720,7 @@ const MarketDetails: React.FC<MarketDetailsProps> = ({ market, selectedSide, set
             )}
             {claimable && (
                 <ClaimableAmount>
-                    Amount Claimable: <span>{formatCurrencyWithSign(USD_SIGN, claimableAmount)}</span>
+                    Amount Claimable: <span>{formatCurrencyWithSign(USD_SIGN, claimableAmount, 2)}</span>
                 </ClaimableAmount>
             )}
             {claimable && (

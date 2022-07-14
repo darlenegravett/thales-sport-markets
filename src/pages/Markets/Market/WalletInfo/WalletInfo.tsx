@@ -16,6 +16,7 @@ import { Balances, MarketData } from '../../../../types/markets';
 import { Position, Side } from '../../../../constants/options';
 import { ODDS_COLOR } from '../../../../constants/ui';
 import { ReactComponent as WalletIcon } from 'assets/images/wallet-icon.svg';
+import { FlexDivCentered } from '../../../../styles/common';
 
 type WalletInfoProps = {
     market: MarketData | undefined;
@@ -39,60 +40,59 @@ const WalletInfo: React.FC<WalletInfoProps> = ({ market }) => {
     return (
         <WalletInfoContainer hasBalances={!!balances?.home || !!balances?.away || !!balances?.draw}>
             <TokenInfo>
-                <WalletIcon />
-                <Title>IN WALLET:</Title>
+                <FlexDivCentered>
+                    <WalletIcon />
+                    <Title>IN WALLET:</Title>
+                </FlexDivCentered>
                 <ValueContainer>
                     {!!balances?.home && (
-                        <>
+                        <FlexDivCentered>
                             <Token color={ODDS_COLOR.HOME}>1</Token>
                             <Value>
                                 {market?.homeTeam.toUpperCase()}: {balances?.home}
                             </Value>
                             <AlternateValue>
                                 (${' '}
-                                {(market?.resolved && //@ts-ignore
-                                Position[market.finalResult - 1] == Position.HOME
+                                {(market?.resolved && market.finalResult - 1 == Position.HOME
                                     ? 1 * (balances?.home || 0)
                                     : (market?.positions[Position.HOME].sides[Side.SELL].odd || 0) *
                                       (balances?.home || 0)
                                 ).toFixed(2)}
                                 )
                             </AlternateValue>
-                        </>
-                    )}
-                    {!!balances?.away && (
-                        <>
-                            <Token color={ODDS_COLOR.AWAY}>2</Token>
-                            <Value>
-                                {market?.awayTeam.toUpperCase()}: {balances?.away}
-                            </Value>
-                            <AlternateValue>
-                                (${' '}
-                                {(market?.resolved && //@ts-ignore
-                                Position[market.finalResult - 1] == Position.AWAY
-                                    ? 1 * (balances?.away || 0)
-                                    : (market?.positions[Position.AWAY].sides[Side.SELL].odd || 0) *
-                                      (balances?.away || 0)
-                                ).toFixed(2)}
-                                )
-                            </AlternateValue>
-                        </>
+                        </FlexDivCentered>
                     )}
                     {!!balances?.draw && (
-                        <>
+                        <FlexDivCentered>
                             <Token color={ODDS_COLOR.DRAW}>X</Token>
                             <Value>DRAW: {balances?.draw}</Value>
                             <AlternateValue>
                                 (${' '}
-                                {(market?.resolved && //@ts-ignore
-                                Position[market.finalResult - 1] == Position.DRAW
+                                {(market?.resolved && market.finalResult - 1 == Position.DRAW
                                     ? 1 * (balances?.draw || 0)
                                     : (market?.positions[Position.DRAW].sides[Side.SELL].odd || 0) *
                                       (balances?.draw || 0)
                                 ).toFixed(2)}
                                 )
                             </AlternateValue>
-                        </>
+                        </FlexDivCentered>
+                    )}
+                    {!!balances?.away && (
+                        <FlexDivCentered>
+                            <Token color={ODDS_COLOR.AWAY}>2</Token>
+                            <Value>
+                                {market?.awayTeam.toUpperCase()}: {balances?.away}
+                            </Value>
+                            <AlternateValue>
+                                (${' '}
+                                {(market?.resolved && market.finalResult - 1 == Position.AWAY
+                                    ? 1 * (balances?.away || 0)
+                                    : (market?.positions[Position.AWAY].sides[Side.SELL].odd || 0) *
+                                      (balances?.away || 0)
+                                ).toFixed(2)}
+                                )
+                            </AlternateValue>
+                        </FlexDivCentered>
                     )}
                 </ValueContainer>
             </TokenInfo>

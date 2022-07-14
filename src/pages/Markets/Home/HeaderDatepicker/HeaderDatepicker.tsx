@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FlexDivColumn } from 'styles/common';
 import { GamesOnDate } from 'types/markets';
 import { formatDayOfWeek, formatShortDateNoYear } from 'utils/formatters/date';
-import Hammer from 'hammerjs';
+import Hammer, { DIRECTION_HORIZONTAL } from 'hammerjs';
 
 type HeaderDatepickerProps = {
     gamesPerDay: GamesOnDate[];
@@ -26,7 +26,6 @@ const HeaderDatepicker: React.FC<HeaderDatepickerProps> = ({
     const [hammerManager, setHammerManager] = useState<any>();
 
     const moveLeft = () => {
-        // if (farLeftDateIndex === 0) setFarLeftDateIndex(0);
         if (farLeftDateIndex > 0) setFarLeftDateIndex(farLeftDateIndex - 1);
     };
 
@@ -49,7 +48,7 @@ const HeaderDatepicker: React.FC<HeaderDatepickerProps> = ({
                 }
 
                 if (window.innerWidth <= 1250) {
-                    const swipe = new Hammer.Swipe();
+                    const swipe = new Hammer.Swipe({ direction: DIRECTION_HORIZONTAL });
                     hammer.add(swipe);
                     hammer.on('swipeleft', moveRight);
                     hammer.on('swiperight', moveLeft);
@@ -67,7 +66,7 @@ const HeaderDatepicker: React.FC<HeaderDatepickerProps> = ({
             {gamesPerDay.length > 0 ? (
                 <>
                     <LeftIcon
-                        onClick={() => (farLeftDateIndex == 0 ? moveLeft() : '')}
+                        onClick={() => (farLeftDateIndex !== 0 ? moveLeft() : '')}
                         disabled={farLeftDateIndex == 0}
                     />
                     {slicedDates.map((data: GamesOnDate, index: number) => (
@@ -88,7 +87,7 @@ const HeaderDatepicker: React.FC<HeaderDatepickerProps> = ({
                         </DateContainer>
                     ))}
                     <RightIcon
-                        onClick={() => (farLeftDateIndex + DATES_TO_SHOW >= gamesPerDay?.length ? moveRight() : '')}
+                        onClick={() => (farLeftDateIndex + DATES_TO_SHOW < gamesPerDay?.length ? moveRight() : '')}
                         disabled={farLeftDateIndex + DATES_TO_SHOW >= gamesPerDay?.length}
                     />
                 </>
@@ -112,6 +111,8 @@ const Wrapper = styled.div`
     }
 
     @media (max-width: 768px) {
+        margin-top: 20px;
+        margin-bottom: 20px;
         & > div {
             box-shadow: var(--shadow);
         }
@@ -166,6 +167,7 @@ const DateContainer = styled(FlexDivColumn)<{ selected?: boolean }>`
     align-items: center;
     justify-content: flex-end;
     cursor: pointer;
+    color: ${(props) => (props.selected ? props.theme.textColor.quaternary : props.theme.textColor.primary)};
     &:not(:last-of-type) {
         border-right: 2px solid ${(props) => props.theme.borderColor.secondary};
     }
