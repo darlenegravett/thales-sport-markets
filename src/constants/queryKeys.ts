@@ -92,17 +92,22 @@ export const QUERY_KEYS = {
             walletAddress,
             networkId,
         ],
-        GetUsdDefaultAmount: (networkId: NetworkId) => ['wallet', 'getUsdDefaultAmount', networkId],
         OvertimeVoucher: (walletAddress: string, networkId: NetworkId) => [
             'wallet',
             'overtimeVoucher',
             walletAddress,
             networkId,
         ],
+        OvertimeVoucherEscrow: (walletAddress: string, networkId: NetworkId) => [
+            'wallet',
+            'overtimeVoucherEscrow',
+            walletAddress,
+            networkId,
+        ],
         Stats: (networkId: NetworkId, walletAddress: string) => ['wallet', 'stats', networkId, walletAddress],
         VaultsAndLpTxs: (networkId: NetworkId, walletAddress: string) => [
             'wallet',
-            'VaultsAndLpTxs',
+            'vaultsAndLpTxs',
             networkId,
             walletAddress,
         ],
@@ -115,7 +120,6 @@ export const QUERY_KEYS = {
     Zebro: (networkId: NetworkId) => ['zebro', networkId],
     Vault: {
         Data: (vaultAddress: string, networkId: NetworkId) => [vaultAddress, 'data', networkId],
-        Overview: (vaultAddress: string, networkId: NetworkId) => ['overview', vaultAddress, networkId],
         UserData: (vaultAddress: string, walletAddress: string, networkId: NetworkId) => [
             vaultAddress,
             'data',
