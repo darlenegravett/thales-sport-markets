@@ -2,14 +2,17 @@ import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { COLLATERALS_INDEX } from 'constants/currency';
 import { ParlayErrorCode } from 'constants/markets';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
-import { MultiSingleAmounts, ParlayPayment, ParlaysMarketPosition } from 'types/markets';
+import { MultiSingleAmounts, ParlayPayment, ParlaysMarketPosition, SGPItem } from 'types/markets';
 import localStore from 'utils/localStore';
 import { RootState } from '../rootReducer';
+import { getCombinedMarketsFromParlayData } from 'utils/combinedMarkets';
+import { fixEnetpulseRacingName } from 'utils/formatters/string';
 
 const sliceName = 'parlay';
 
 const DEFAULT_MAX_NUMBER_OF_MATCHES = 8;
 const MAX_NUMBER_OF_DOUBLE_CHANCES_ON_PARLAY = 5;
+const MAX_NUMBER_OF_COMBINED_MARKETS_IN_PARLAY = 4;
 
 const getDefaultParlay = (): ParlaysMarketPosition[] => {
     const lsParlay = localStore.get(LOCAL_STORAGE_KEYS.PARLAY);
@@ -55,6 +58,7 @@ type ParlaySliceState = {
     payment: ParlayPayment;
     multiSingle: MultiSingleAmounts[];
     isMultiSingle: boolean;
+    sgpFees: SGPItem[];
     error: { code: ParlayErrorCode; data: string };
 };
 
@@ -64,6 +68,7 @@ const initialState: ParlaySliceState = {
     payment: getDefaultPayment(),
     multiSingle: getDefaultMultiSingle(),
     isMultiSingle: getDefaultIsMultiSingle(),
+    sgpFees: [],
     error: getDefaultError(),
 };
 
@@ -75,6 +80,23 @@ export const parlaySlice = createSlice({
             const parlayCopy = [...state.parlay];
             const index = state.parlay.findIndex((el) => el.parentMarket === action.payload.parentMarket);
             const numberOfDoubleChances = parlayCopy.filter((market) => market.doubleChanceMarketType !== null).length;
+            const combinedMarketsInParlay = getCombinedMarketsFromParlayData(state.parlay);
+
+            if (combinedMarketsInParlay.length) {
+                const nonCombinedMarkets =
+                    state.parlay.length - combinedMarketsInParlay.length > 0
+                        ? state.parlay.length - combinedMarketsInParlay.length
+                        : 0;
+                if (combinedMarketsInParlay.length + nonCombinedMarkets + 1 > state.parlaySize) {
+                    state.error.code = ParlayErrorCode.MAX_NUMBER_OF_MARKETS_WITH_COMBINED_MARKETS;
+                    state.error.data = DEFAULT_MAX_NUMBER_OF_MATCHES.toString();
+                    return;
+                }
+            }
+            const multipleDriversAtOneRace = parlayCopy
+                .filter((market) => market.isRacingMarket)
+                .map((market) => market.tag)
+                .findIndex((tag) => tag == action.payload.tag);
 
             if (
                 action.payload.doubleChanceMarketType !== null &&
@@ -83,13 +105,24 @@ export const parlaySlice = createSlice({
             ) {
                 state.error.code = ParlayErrorCode.MAX_DOUBLE_CHANCES;
                 state.error.data = MAX_NUMBER_OF_DOUBLE_CHANCES_ON_PARLAY.toString();
+            } else if (multipleDriversAtOneRace !== -1) {
+                const existingRaceDriver = parlayCopy
+                    .filter((market) => market.isRacingMarket)
+                    .map((market) => market.homeTeam)[multipleDriversAtOneRace];
+
+                state.error.code = ParlayErrorCode.SAME_RACE_DRIVERS;
+                state.error.data =
+                    fixEnetpulseRacingName(existingRaceDriver) + '/' + fixEnetpulseRacingName(action.payload.homeTeam);
             } else if (index === -1) {
                 // ADD new market
                 if (state.parlay.length < state.parlaySize) {
-                    const allParlayTeams = parlayCopy.map((market) => [market.homeTeam, market.awayTeam]).flat();
+                    const parlayTeamsByLeague = parlayCopy
+                        .filter((market) => market.tags[0] === action.payload.tags[0])
+                        .map((market) => [market.homeTeam, market.awayTeam])
+                        .flat();
 
-                    const homeTeamInParlay = allParlayTeams.filter((team) => team === action.payload.homeTeam)[0];
-                    const awayTeamInParlay = allParlayTeams.filter((team) => team === action.payload.awayTeam)[0];
+                    const homeTeamInParlay = parlayTeamsByLeague.filter((team) => team === action.payload.homeTeam)[0];
+                    const awayTeamInParlay = parlayTeamsByLeague.filter((team) => team === action.payload.awayTeam)[0];
 
                     if (homeTeamInParlay || awayTeamInParlay) {
                         state.error.code = ParlayErrorCode.SAME_TEAM_TWICE;
@@ -97,6 +130,7 @@ export const parlaySlice = createSlice({
                     } else {
                         state.multiSingle.push({
                             sportMarketAddress: action.payload.sportMarketAddress,
+                            parentMarketAddress: action.payload.parentMarket,
                             amountToBuy: 0,
                         });
                         state.parlay.push(action.payload);
@@ -122,12 +156,67 @@ export const parlaySlice = createSlice({
             localStore.set(LOCAL_STORAGE_KEYS.PARLAY, state.parlay);
             localStore.set(LOCAL_STORAGE_KEYS.MULTI_SINGLE, state.multiSingle);
         },
+        updateParlayWithMultiplePositions: (state, action: PayloadAction<ParlaysMarketPosition[]>) => {
+            const combinedMarkets = getCombinedMarketsFromParlayData(state.parlay);
+            const incomingCombinedMarkets = getCombinedMarketsFromParlayData(action.payload);
+
+            if (incomingCombinedMarkets.length && Math.round(combinedMarkets.length / 2) == 4) {
+                state.error.code = ParlayErrorCode.MAX_COMBINED_MARKETS;
+                state.error.data = MAX_NUMBER_OF_COMBINED_MARKETS_IN_PARLAY.toString();
+                return;
+            }
+
+            if (state.parlay.length + action.payload.length > state.parlaySize) {
+                state.error.code = ParlayErrorCode.MAX_MATCHES;
+                state.error.data = state.parlaySize.toString();
+                return;
+            }
+
+            if (state.multiSingle.length == 0) {
+                localStore.set(LOCAL_STORAGE_KEYS.IS_MULTI_SINGLE, false);
+            }
+
+            // action.payload.forEach((item) => {
+            //     state.multiSingle.push({
+            //         sportMarketAddress: item.sportMarketAddress,
+            //         amountToBuy: 0,
+            //     });
+            // });
+
+            state.parlay.push(...action.payload);
+            localStore.set(LOCAL_STORAGE_KEYS.PARLAY, state.parlay);
+            // localStore.set(LOCAL_STORAGE_KEYS.MULTI_SINGLE, state.multiSingle);
+        },
         setParlaySize: (state, action: PayloadAction<number>) => {
             state.parlaySize = action.payload;
         },
         removeFromParlay: (state, action: PayloadAction<string>) => {
-            state.parlay = state.parlay.filter((market) => market.sportMarketAddress !== action.payload);
+            state.parlay = state.parlay.filter(
+                (market) => market.sportMarketAddress !== action.payload && market.parentMarket !== action.payload
+            );
             state.multiSingle = state.multiSingle.filter((ms) => ms.sportMarketAddress !== action.payload);
+
+            if (state.multiSingle.length == 0) {
+                state.isMultiSingle = false;
+                localStore.set(LOCAL_STORAGE_KEYS.IS_MULTI_SINGLE, state.isMultiSingle);
+            }
+
+            if (state.parlay.length === 0) {
+                state.payment.amountToBuy = getDefaultPayment().amountToBuy;
+            }
+            state.error = getDefaultError();
+            localStore.set(LOCAL_STORAGE_KEYS.PARLAY, state.parlay);
+            localStore.set(LOCAL_STORAGE_KEYS.MULTI_SINGLE, state.multiSingle);
+        },
+        removeCombinedMarketFromParlay: (state, action: PayloadAction<string>) => {
+            state.parlay = state.parlay.filter((market) => market.parentMarket !== action.payload);
+            state.multiSingle = state.multiSingle.filter(
+                (ms) => ms.sportMarketAddress !== action.payload && ms.parentMarketAddress !== action.payload
+            );
+
+            if (state.multiSingle.length == 0) {
+                localStore.set(LOCAL_STORAGE_KEYS.IS_MULTI_SINGLE, false);
+            }
 
             if (state.parlay.length === 0) {
                 state.payment.amountToBuy = getDefaultPayment().amountToBuy;
@@ -141,6 +230,7 @@ export const parlaySlice = createSlice({
             state.payment.amountToBuy = getDefaultPayment().amountToBuy;
             state.multiSingle = [];
             state.error = getDefaultError();
+            localStore.set(LOCAL_STORAGE_KEYS.IS_MULTI_SINGLE, false);
             localStore.set(LOCAL_STORAGE_KEYS.PARLAY, state.parlay);
             localStore.set(LOCAL_STORAGE_KEYS.MULTI_SINGLE, state.multiSingle);
         },
@@ -178,6 +268,10 @@ export const parlaySlice = createSlice({
         resetParlayError: (state) => {
             state.error = getDefaultError();
         },
+        setSGPFees: (state, action: PayloadAction<SGPItem[]>) => {
+            state.sgpFees = [...action.payload];
+            localStore.set(LOCAL_STORAGE_KEYS.SGP_FEES, state.sgpFees);
+        },
     },
 });
 
@@ -189,14 +283,17 @@ export const getLastSavedOrDefaultStableIndex = (): COLLATERALS_INDEX => {
 
 export const {
     updateParlay,
+    updateParlayWithMultiplePositions,
     setParlaySize,
     removeFromParlay,
+    removeCombinedMarketFromParlay,
     removeAll,
     setPayment,
     setMultiSingle,
     setIsMultiSingle,
     setPaymentSelectedStableIndex,
     resetParlayError,
+    setSGPFees,
     removeFromMultiSingle,
 } = parlaySlice.actions;
 
@@ -208,5 +305,6 @@ export const getParlaySize = (state: RootState) => getParlayState(state).parlayS
 export const getParlayPayment = (state: RootState) => getParlayState(state).payment;
 export const getParlayError = (state: RootState) => getParlayState(state).error;
 export const getHasParlayError = createSelector(getParlayError, (error) => error.code != ParlayErrorCode.NO_ERROS);
+export const getSGPFees = (state: RootState) => getParlayState(state).sgpFees;
 
 export default parlaySlice.reducer;

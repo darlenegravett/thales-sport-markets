@@ -81,7 +81,9 @@
             "user-rejected-tx": "User rejected transaction",
             "enter-address": "Enter address",
             "invalid-address": "Invalid address",
-            "batch-transaction-single-failure": "Транзакция была отклонена или не удалась."
+            "batch-transaction-single-failure": "Транзакция была отклонена или не удалась.",
+            "enter-percentage": "Enter percentage",
+            "invalid-percentage-range": "The percentage must be between {{min}} and {{max}}"
         },
         "time-remaining": {
             "ended": "ended",
@@ -148,7 +150,9 @@
         "no": "NO",
         "mls-tooltip": "Результаты рынков MLS основаны на результатах регулирования, и если они перейдут к овертайму, результатом регулирования будет тот, на котором будет решать рынок.",
         "fifa-tooltip": "Результаты рынков чемпионата мира по футболу FIFA основаны на результатах регламента, и если они перейдут в овертайм, то рынок примет решение по регламенту.",
-        "tennis-tooltip": "В случае отказа матч считается отмененным. В случае выхода/дисквалификации во время матча это будет считаться победой игрока, прошедшего в следующий раунд."
+        "tennis-tooltip": "В случае отказа матч считается отмененным. В случае выхода/дисквалификации во время матча это будет считаться победой игрока, прошедшего в следующий раунд.",
+        "iihf-tooltip": "Рыночные результаты чемпионата мира по хоккею с шайбой основаны на результатах регламента, и если они перейдут в овертайм, то рынок примет решение по регламенту.",
+        "uefa-tooltip": "Результаты рынков УЕФА основаны на результатах регламента, и если они перейдут в овертайм, то рынок определит результат регламента."
     },
     "footer": {
         "all-rights-reserved": "© {{year}} eXoticV ALL RIGHTS RESERVED.",
@@ -223,7 +227,9 @@
                 "motosport": "Мотоспорт",
                 "favourites": "Избранное",
                 "esports": "Киберспорт",
-                "cricket": "Крикет"
+                "cricket": "Крикет",
+                "mma": "ХОРОШИЙ",
+                "boxing": "Заниматься боксом"
             },
             "all": "All",
             "datepicker": {
@@ -271,7 +277,8 @@
         "race-starts": "Старт гонки",
         "back": "Назад",
         "apply-filters": "Применить фильтры",
-        "incentivized-market": "СТИМУЛИРОВАННЫЙ РЫНОК"
+        "incentivized-market": "СТИМУЛИРОВАННЫЙ РЫНОК",
+        "f1-market": "{{driver}} выигрывает {{race}}"
     },
     "markets": {
         "market-card": {
@@ -293,7 +300,8 @@
                 "winner": "Winner",
                 "spread": "Handicap",
                 "total": "Total",
-                "double-chance": "Double chance"
+                "double-chance": "Double chance",
+                "combined-positions": "Комбинированные позиции"
             },
             "odd-tooltip": {
                 "scoring": {
@@ -318,7 +326,9 @@
                     "12": "{{team}} or {{team2}} will win the match {{matchResolve}}.",
                     "1x2": "{{team}} will win the match or the match will end in a draw {{matchResolve}}."
                 },
-                "bonus": "{{bonus}} added bonus on win!"
+                "bonus": "{{bonus}} added bonus on win!",
+                "and": "и",
+                "race-winner": "{{team}} выиграет гонку {{matchResolve}}"
             },
             "starts-in": "Начинается через",
             "period": "Период",
@@ -376,7 +386,10 @@
                 "max-payout": "Максимальная поддерживаемая выплата: {{max}}",
                 "max-profit": "Максимальная поддерживаемая прибыль составляет {{max}}",
                 "max-teams": "Максимум {{max}} рынков в Parlay",
-                "no-funds-multi-collateral": "Убедитесь, что в вашем кошельке достаточно средств (на {{percentage}}% больше суммы бай-ина)"
+                "no-funds-multi-collateral": "Убедитесь, что в вашем кошельке достаточно средств (на {{percentage}}% больше суммы бай-ина)",
+                "same-race-drivers": "Поддерживается только один гонщик на гонку. Невозможно добавить {{addedDriver}}, поскольку {{existingDriver}} уже находится в Parlay",
+                "max-number-of-markets-with-combined-markets": "Максимальное количество рынков в Parlay: {{max}}. Один комбинированный рынок считается двумя обычными рынками.",
+                "max-combined-markets": "Максимальное количество комбинированных рынков в Parlay составляет {{max}}."
             },
             "fee": "Общая плата",
             "empty-title": "Нет позиций",
@@ -810,12 +823,12 @@
         "variables-parlay": "<p>Переменные:</p><ul><li> Коэффициент использования: {{utilizationRate}}</li><li> Нижний предел цены: {{priceLowerLimit}}</li><li> Верхний предел цены: {{priceUpperLimit}}</li><li> Максимальное влияние перекоса: {{skewImpactLimit}}</li><li> Максимальное распределение на один экспресс: {{allocationLimitsPerMarketPerRound}}</li><li> Максимальный общий депозит: {{maxAllowedDeposit}}</li><li> Максимальное количество пользователей в хранилище: {{maxAllowedUsers}}</li><li> Минимальная сумма для одной сделки: {{minTradeAmount}}</li><li> Минимальный депозит: {{minDepositAmount}}</li><li> Продолжительность раунда: {{roundLength}} дней</li></ul>"
     },
     "parlay-leaderboard": {
-        "title": "Таблица поощрений Parlay",
-        "description": "A total of <bold>{{amount}}</bold> will be distributed to the best parlays on a <bold>bi-weekly basis</bold> starting from March 1st. The tickets will be ranked based on the number of positions on the parlays, followed by total quote.",
-        "distribution-note": "Rewards will be distributed to the <bold>TOP 30 parlays every 2 weeks</bold>!",
+        "title": "Parlay Incentives Leaderboard",
+        "description": "A total of <bold>{{amount}}</bold> will be distributed to the best parlays with minimum 3 games on a <bold>bi-weekly basis</bold>. The tickets will be ranked based on a total quote, followed by the number of positions on the parlays.",
+        "distribution-note": "Rewards will be distributed to the <bold>TOP 10 parlays every 2 weeks</bold>!",
         "no-parlays": "No winning parlays registered in the period yet.",
         "warning": "*Overtime team holds the right to disqualify wallets we suspect of gaming the system.",
-        "info": "If multiple parlays have the same number of positions and total quote the following will be used as tie-breakers in respective order:",
+        "info": "If multiple parlays have the same total quote and the number of positions the following will be used as tie-breakers in respective order:",
         "info1": "- The amount paid",
         "info2": "- Actual total quote (gotten by multiplying positions individually)",
         "info3": "*1 winning parlay eligible per wallet",
@@ -994,7 +1007,7 @@
     },
     "liquidity-pool": {
         "title": "Provide Liquidity",
-        "description": "<h1>Description</h1><p>Liquidity providing involves users depositing stablecoin collateral into a smart contract-based liquidity pool for Overtime trading. The collateral deposited is used to facilitate trading on Overtime's AMM.</p><p>To be able to provide liquidity you'll need to be staking THALES. There's no maximum cap per wallet and you may deposit a maximum of 1 {{currency}} per {{thalesStakedAmount}} THALES staked until the liquidity pool is filled.</p><p>At the end of each round, the proportional share of that round's PnL will be added to your deposited balance.</p><p>If you wish to withdraw, you can signal that at any time during the ongoing round, and at the end of the round your balance (inclusive of that round's PnL) is sent to you. To withdraw, you need to have at least {{thalesStakedAmount}} THALES staked per each {{currency}} you are withdrawing.</p><p>If you decide to unstake THALES while providing liquidity, please be aware that you'll need to signal a withdrawal from the liquidity pool first.</p><p>Providing liquidity exposes you to various risks including potential losses due to users winning in trading as well as smart contract security risks. Please make sure you understand these risks before depositing.</p><p><tipLink>TIP-99</tipLink> has more details on the technical implementation of Overtime liquidity providing.</p>",
+        "description": "<h1>Description</h1><p>Liquidity providing involves users depositing stablecoin collateral into a smart contract-based liquidity pool for Overtime trading. The collateral deposited is used to facilitate trading on Overtime's AMM.</p><p>To be able to provide liquidity you'll need to be staking THALES. There's no maximum cap per wallet and you may deposit a maximum of 1 {{currency}} per {{thalesStakedAmount}} THALES staked until the liquidity pool is filled.</p><p>At the end of each round, the proportional share of that round's PnL will be added to your deposited balance.</p><p>If you wish to withdraw, you can signal that at any time during the ongoing round, and at the end of the round the amount you signaled for withdrawal (inclusive of that round's PnL) is sent to you.  The minimum amount to be withdrawn is set to 10%</p><p>If you decide to unstake THALES while providing liquidity, please be aware that you'll need to signal a withdrawal from the liquidity pool first.</p><p>Providing liquidity exposes you to various risks including potential losses due to users winning in trading as well as smart contract security risks. Please make sure you understand these risks before depositing.</p><p><tipLink>TIP-99</tipLink> has more details on the technical implementation of Overtime liquidity providing.</p>",
         "variables": "<h1>Variables</h1><ul><li>Max total deposit: {{maxAllowedDeposit}}</li><li>Max users in the pool: {{maxAllowedUsers}}</li><li>Minimum deposit: {{minDepositAmount}}</li><li>Round duration: {{roundLength}} days</li></ul>",
         "liquidity-pool-not-started-message": "The liquidity pool has not started",
         "liquidity-pool-paused-message": "The liquidity pool is paused",
@@ -1009,13 +1022,16 @@
         "max-allowance-label": "Max allowance",
         "your-thales-staked-label": "Your THALES staked",
         "allowance-multiplier-label": "Allowance multiplier",
-        "withdrawal-request-label": "Withdrawal request: {{amount}}",
+        "full-withdrawal-request-label": "Withdrawal request: {{amount}}<tooltip />",
+        "partial-withdrawal-request-label": "Withdrawal request: {{percentage}} of the balance ({{amount}}<tooltip />)",
         "estimated-amount-tooltip": "This is an estimated amount. The actual amount will be calculated upon closing the current round based on the round PnL.",
         "deposit-amount-placeholder": "Enter amount",
         "available-to-withdraw-label": "Available to withdraw: <bold>{{amount}}</bold>",
         "nothing-to-withdraw-label": "Nothing to withdraw.",
-        "withdrawal-message": "You can request a withdrawal and your funds will be sent to you automatically at the end of the round when the round closes.",
-        "withdrawal-requested-message": "You requested to withdraw <bold>{{amount}}</bold><tooltip />. Your funds will be sent to you automatically at the end of the round when the round closes.",
+        "withdrawal-message": "You can request a full/partial withdrawal and your funds will be sent to you automatically at the end of the round when the round closes.",
+        "full-withdrawal-requested-message": "You requested to withdraw a full balance of <bold>{{amount}}</bold><tooltip />.",
+        "partial-withdrawal-requested-message": "You requested to withdraw {{percentage}} of the balance (<bold>{{amount}}</bold><tooltip />).",
+        "withdrawal-requested-message": "Your funds will be sent to you automatically at the end of the round when the round closes.",
         "first-deposit-withdrawal-message": "You deposited for the next round and you can withdraw these funds at the end of the next round.",
         "deposit-withdrawal-warning": "Withdrawal is requested, you cannot deposit.",
         "deposit-max-amount-of-users-warning": "Maximum number of users in the liquidity pool is reached, you cannot deposit.",
@@ -1024,7 +1040,10 @@
         "deposit-staked-thales-error": "Deposit amount exceeds max allowance, stake more THALES to deposit",
         "deposit-min-amount-error": "The minimum amount for the deposit is {{amount}}",
         "withdrawal-deposit-warning": "You cannot withdraw as you already deposited for the next round.",
-        "withdrawal-staked-thales-warning": "You cannot withdraw as you need more staked THALES to withdraw. Stake {{amount}} THALES more to enable withdrawal.",
+        "full-withdrawal-label": "Full withdrawal",
+        "partial-withdrawal-label": "Partial withdrawal",
+        "percentage-placeholder": "Enter percentage",
+        "withdrawal-amount-label": "Withdrawal amount: <bold>{{amount}}</bold>",
         "tabs": {
             "deposit": "Deposit",
             "withdraw": "Withdraw"
@@ -1066,6 +1085,12 @@
                 "withdrawalRequest": "Withdrawal Request",
                 "claim": "Withdrawal Claim"
             }
+        },
+        "return": {
+            "title": "Возвращаться",
+            "arr": "Средняя доходность раунда (ARR)",
+            "apr": "Прогнозируемая годовая процентная ставка на основе ARR",
+            "apy": "Прогнозируемый годичный год на основе годовой процентной ставки"
         }
     }
 }

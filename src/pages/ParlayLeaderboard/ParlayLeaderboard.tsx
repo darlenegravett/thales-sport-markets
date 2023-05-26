@@ -1,4 +1,3 @@
-import PositionSymbol from 'components/PositionSymbol';
 import Search from 'components/Search';
 import SelectInput from 'components/SelectInput';
 import Table from 'components/Table';
@@ -8,9 +7,11 @@ import {
     OddsType,
     PARLAY_LEADERBOARD_BIWEEKLY_START_DATE,
     PARLAY_LEADERBOARD_BIWEEKLY_START_DATE_UTC,
-    PARLAY_LEADERBOARD_FEBRUARY_REWARDS,
-    PARLAY_LEADERBOARD_OPTIMISM_REWARDS,
-    PARLAY_LEADERBOARD_ARBITRUM_REWARDS,
+    PARLAY_LEADERBOARD_FIRST_PERIOD_TOP_10_REWARDS,
+    PARLAY_LEADERBOARD_OPTIMISM_REWARDS_TOP_10,
+    PARLAY_LEADERBOARD_ARBITRUM_REWARDS_TOP_10,
+    PARLAY_LEADERBOARD_OPTIMISM_REWARDS_TOP_20,
+    PARLAY_LEADERBOARD_ARBITRUM_REWARDS_TOP_20,
 } from 'constants/markets';
 import { t } from 'i18next';
 import { addDays, differenceInDays, subMilliseconds } from 'date-fns';
@@ -27,7 +28,7 @@ import { getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import { RootState } from 'redux/rootReducer';
 import styled from 'styled-components';
 import { FlexDivColumn, FlexDivRow, FlexDivRowCentered, FlexDivStart } from 'styles/common';
-import { ParlayMarketWithRank, PositionData, SportMarketInfo } from 'types/markets';
+import { ParlayMarket, ParlayMarketWithRank, PositionData, SportMarketInfo } from 'types/markets';
 import { getEtherscanAddressLink } from 'utils/etherscan';
 import { formatDateWithTime } from 'utils/formatters/date';
 import { formatCurrencyWithKey, formatCurrencyWithSign } from 'utils/formatters/number';
@@ -35,17 +36,21 @@ import { truncateAddress } from 'utils/formatters/string';
 import {
     convertFinalResultToResultType,
     convertPositionNameToPosition,
-    convertPositionNameToPositionType,
     formatMarketOdds,
-    getOddTooltipText,
-    getSpreadTotalText,
-    getSymbolText,
+    syncPositionsAndMarketsPerContractOrderInParlay,
 } from 'utils/markets';
 import { NetworkIdByName } from 'utils/network';
 import TimeRemaining from 'components/TimeRemaining';
+import {
+    extractCombinedMarketsFromParlayMarketType,
+    removeCombinedMarketsFromParlayMarketType,
+} from 'utils/combinedMarkets';
+import { getParlayRow } from 'pages/Profile/components/TransactionsHistory/components/ParlayTransactions/ParlayTransactions';
+import i18n from 'i18n';
 
 const ParlayLeaderboard: React.FC = () => {
     const { t } = useTranslation();
+    const language = i18n.language;
     const networkId = useSelector((state: RootState) => getNetworkId(state));
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state));
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
@@ -56,40 +61,26 @@ const ParlayLeaderboard: React.FC = () => {
 
     const periodOptions: Array<{ value: number; label: string }> = [];
 
-    let startingBiweeklyPeriod = 0;
-    if (networkId !== NetworkIdByName.ArbitrumOne) {
-        startingBiweeklyPeriod = 1;
-        periodOptions.push({
-            value: 0,
-            label: `${t(`parlay-leaderboard.periods.february`)} 2023`,
-        });
-    }
     const latestPeriodBiweekly = Math.trunc(differenceInDays(new Date(), PARLAY_LEADERBOARD_BIWEEKLY_START_DATE) / 14);
-    const numberOfPeriods = latestPeriodBiweekly + startingBiweeklyPeriod;
 
-    for (let index = startingBiweeklyPeriod; index <= numberOfPeriods; index++) {
+    for (let index = 0; index <= latestPeriodBiweekly; index++) {
         periodOptions.push({
             value: index,
-            label: `${t(`parlay-leaderboard.periods.bi-weekly-period`)} ${index + 1 - startingBiweeklyPeriod}`,
+            label: `${t(`parlay-leaderboard.periods.bi-weekly-period`)} ${index + 1}`,
         });
     }
 
-    const [period, setPeriod] = useState<number>(numberOfPeriods);
+    const [period, setPeriod] = useState<number>(latestPeriodBiweekly);
 
-    useEffect(() => setPeriod(numberOfPeriods), [numberOfPeriods]);
+    useEffect(() => setPeriod(latestPeriodBiweekly), [latestPeriodBiweekly]);
 
-    useEffect(() => {
-        if (networkId !== NetworkIdByName.ArbitrumOne && period == 0) {
-            setPeriodEnd(0);
-        } else {
+    useEffect(
+        () =>
             setPeriodEnd(
-                subMilliseconds(
-                    addDays(PARLAY_LEADERBOARD_BIWEEKLY_START_DATE_UTC, (period + 1 - startingBiweeklyPeriod) * 14),
-                    1
-                ).getTime()
-            );
-        }
-    }, [period, networkId, startingBiweeklyPeriod]);
+                subMilliseconds(addDays(PARLAY_LEADERBOARD_BIWEEKLY_START_DATE_UTC, (period + 1) * 14), 1).getTime()
+            ),
+        [period, networkId]
+    );
 
     const parlayLeaderboardQuery = useParlayLeaderboardQuery(networkId, period, { enabled: isAppReady });
 
@@ -104,12 +95,14 @@ const ParlayLeaderboard: React.FC = () => {
 
     const rewards =
         networkId !== NetworkIdByName.ArbitrumOne
-            ? period === 0
-                ? PARLAY_LEADERBOARD_FEBRUARY_REWARDS
-                : PARLAY_LEADERBOARD_OPTIMISM_REWARDS
-            : PARLAY_LEADERBOARD_ARBITRUM_REWARDS;
+            ? period >= PARLAY_LEADERBOARD_FIRST_PERIOD_TOP_10_REWARDS
+                ? PARLAY_LEADERBOARD_OPTIMISM_REWARDS_TOP_10
+                : PARLAY_LEADERBOARD_OPTIMISM_REWARDS_TOP_20
+            : period >= PARLAY_LEADERBOARD_FIRST_PERIOD_TOP_10_REWARDS
+            ? PARLAY_LEADERBOARD_ARBITRUM_REWARDS_TOP_10
+            : PARLAY_LEADERBOARD_ARBITRUM_REWARDS_TOP_20;
 
-    const rewardsAmount = networkId !== NetworkIdByName.ArbitrumOne ? '2,000 OP' : '5,000 THALES';
+    const rewardsAmount = networkId !== NetworkIdByName.ArbitrumOne ? '1,000 OP' : '1,000 ARB';
 
     const stickyRow = useMemo(() => {
         const data = parlays.find((parlay) => parlay.account.toLowerCase() == walletAddress?.toLowerCase());
@@ -123,7 +116,11 @@ const ParlayLeaderboard: React.FC = () => {
                                 overlay={
                                     <>
                                         {rewards[data.rank - 1]}{' '}
-                                        {networkId !== NetworkIdByName.ArbitrumOne ? 'OP' : 'THALES'}
+                                        {networkId !== NetworkIdByName.ArbitrumOne
+                                            ? 'OP'
+                                            : period >= PARLAY_LEADERBOARD_FIRST_PERIOD_TOP_10_REWARDS
+                                            ? 'ARB'
+                                            : 'THALES'}
                                     </>
                                 }
                                 component={
@@ -154,10 +151,12 @@ const ParlayLeaderboard: React.FC = () => {
                         onClick={() => setExpandStickyRowState(!expandStickyRow)}
                     />
                 </StickyContrainer>
-                <ExpandedContainer hide={!expandStickyRow}>{getExpandedRow(data, selectedOddsType)}</ExpandedContainer>
+                <ExpandedContainer hide={!expandStickyRow}>
+                    {getExpandedRow(data, selectedOddsType, language)}
+                </ExpandedContainer>
             </StickyRow>
         );
-    }, [expandStickyRow, parlays, walletAddress, selectedOddsType, rewards, networkId]);
+    }, [parlays, rewards, networkId, period, selectedOddsType, expandStickyRow, language, walletAddress]);
 
     const [page, setPage] = useState(0);
     const handleChangePage = (_event: unknown, newPage: number) => {
@@ -248,7 +247,11 @@ const ParlayLeaderboard: React.FC = () => {
                                     overlay={
                                         <>
                                             {rewards[cellProps.cell.value - 1]}{' '}
-                                            {networkId !== NetworkIdByName.ArbitrumOne ? 'OP' : 'THALES'}
+                                            {networkId !== NetworkIdByName.ArbitrumOne
+                                                ? 'OP'
+                                                : period >= PARLAY_LEADERBOARD_FIRST_PERIOD_TOP_10_REWARDS
+                                                ? 'ARB'
+                                                : 'THALES'}
                                         </>
                                     }
                                     component={
@@ -289,9 +292,21 @@ const ParlayLeaderboard: React.FC = () => {
                     {
                         accessor: 'numberOfPositions',
                         Header: <>{t('parlay-leaderboard.sidebar.positions')}</>,
-                        Cell: (cellProps: CellProps<ParlayMarketWithRank, ParlayMarketWithRank['sportMarkets']>) => (
-                            <TableText>{cellProps.cell.value}</TableText>
-                        ),
+                        Cell: (cellProps: any) => {
+                            const parlay = syncPositionsAndMarketsPerContractOrderInParlay(
+                                cellProps.row.original as ParlayMarket
+                            );
+                            const combinedMarkets = extractCombinedMarketsFromParlayMarketType(parlay);
+                            const numberOfMarketsModifiedWithCombinedPositions =
+                                combinedMarkets.length > 0
+                                    ? parlay.sportMarkets.length - combinedMarkets.length
+                                    : parlay.sportMarkets.length;
+                            return (
+                                <FlexCenter>
+                                    <TableText>{numberOfMarketsModifiedWithCombinedPositions}</TableText>
+                                </FlexCenter>
+                            );
+                        },
                         sortable: true,
                     },
                     {
@@ -323,56 +338,17 @@ const ParlayLeaderboard: React.FC = () => {
                 noResultsMessage={t('parlay-leaderboard.no-parlays')}
                 stickyRow={stickyRow}
                 expandedRow={(row) => {
-                    const toRender = row.original.sportMarketsFromContract.map((address: string, index: number) => {
-                        const position = row.original.positions.find(
-                            (position: any) => position.market.address == address
-                        );
+                    const parlay = syncPositionsAndMarketsPerContractOrderInParlay(row.original as ParlayMarket);
 
-                        const positionEnum = convertPositionNameToPositionType(position ? position.side : '');
+                    const combinedMarkets = extractCombinedMarketsFromParlayMarketType(parlay);
+                    const parlayWithoutCombinedMarkets = removeCombinedMarketsFromParlayMarketType(parlay);
 
-                        const symbolText = getSymbolText(positionEnum, position.market);
-                        const spreadTotalText = getSpreadTotalText(position.market, positionEnum);
-
-                        return (
-                            <ParlayRow style={{ opacity: getOpacity(position) }} key={index}>
-                                <ParlayRowText>
-                                    {getPositionStatus(position)}
-                                    <ParlayRowTeam title={position.market.homeTeam + ' vs ' + position.market.awayTeam}>
-                                        {position.market.homeTeam + ' vs ' + position.market.awayTeam}
-                                    </ParlayRowTeam>
-                                </ParlayRowText>
-                                <PositionSymbol
-                                    symbolAdditionalText={{
-                                        text: formatMarketOdds(
-                                            selectedOddsType,
-                                            row.original.marketQuotes ? row.original.marketQuotes[index] : 0
-                                        ),
-                                        textStyle: {
-                                            fontSize: '10.5px',
-                                            marginLeft: '10px',
-                                        },
-                                    }}
-                                    additionalStyle={{ width: 23, height: 23, fontSize: 10.5, borderWidth: 2 }}
-                                    symbolText={symbolText}
-                                    symbolUpperText={
-                                        spreadTotalText
-                                            ? {
-                                                  text: spreadTotalText,
-                                                  textStyle: {
-                                                      backgroundColor: '#1A1C2B',
-                                                      fontSize: '10px',
-                                                      top: '-9px',
-                                                      left: '10px',
-                                                  },
-                                              }
-                                            : undefined
-                                    }
-                                    tooltip={<>{getOddTooltipText(positionEnum, position.market)}</>}
-                                />
-                                <QuoteText>{getParlayItemStatus(position.market)}</QuoteText>
-                            </ParlayRow>
-                        );
-                    });
+                    const toRender = getParlayRow(
+                        parlayWithoutCombinedMarkets,
+                        selectedOddsType,
+                        language,
+                        combinedMarkets
+                    );
 
                     return (
                         <ExpandedRowWrapper>
@@ -439,57 +415,17 @@ export const getOpacity = (position: PositionData) => {
     }
 };
 
-const getExpandedRow = (parlay: ParlayMarketWithRank, selectedOddsType: OddsType) => {
-    const gameList = parlay.sportMarketsFromContract.map((address: string, index: number) => {
-        const position = parlay.positions.find((position: any) => position.market.address == address);
-        if (!position) return;
+const getExpandedRow = (parlay: ParlayMarketWithRank, selectedOddsType: OddsType, language: string) => {
+    const modifiedParlay = syncPositionsAndMarketsPerContractOrderInParlay(parlay);
 
-        const positionEnum = convertPositionNameToPositionType(position ? position.side : '');
+    const combinedMarkets = extractCombinedMarketsFromParlayMarketType(modifiedParlay);
+    const parlayWithoutCombinedMarkets = removeCombinedMarketsFromParlayMarketType(modifiedParlay);
 
-        const symbolText = getSymbolText(positionEnum, position.market);
-        const spreadTotalText = getSpreadTotalText(position.market, positionEnum);
-
-        return (
-            <ParlayRow style={{ opacity: getOpacity(position) }} key={index}>
-                <ParlayRowText>
-                    {getPositionStatus(position)}
-                    <ParlayRowTeam title={position.market.homeTeam + ' vs ' + position.market.awayTeam}>
-                        {position.market.homeTeam + ' vs ' + position.market.awayTeam}
-                    </ParlayRowTeam>
-                </ParlayRowText>
-                <PositionSymbol
-                    symbolAdditionalText={{
-                        text: formatMarketOdds(selectedOddsType, parlay.marketQuotes ? parlay.marketQuotes[index] : 0),
-                        textStyle: {
-                            fontSize: '10.5px',
-                            marginLeft: '10px',
-                        },
-                    }}
-                    additionalStyle={{ width: 23, height: 23, fontSize: 10.5, borderWidth: 2 }}
-                    symbolText={symbolText}
-                    symbolUpperText={
-                        spreadTotalText
-                            ? {
-                                  text: spreadTotalText,
-                                  textStyle: {
-                                      backgroundColor: '#1A1C2B',
-                                      fontSize: '10px',
-                                      top: '-9px',
-                                      left: '10px',
-                                  },
-                              }
-                            : undefined
-                    }
-                    tooltip={<>{getOddTooltipText(positionEnum, position.market)}</>}
-                />
-                <QuoteText>{getParlayItemStatus(position.market)}</QuoteText>
-            </ParlayRow>
-        );
-    });
+    const toRender = getParlayRow(parlayWithoutCombinedMarkets, selectedOddsType, language, combinedMarkets);
 
     return (
         <ExpandedRowWrapper>
-            <FirstSection>{gameList}</FirstSection>
+            <FirstSection>{toRender}</FirstSection>
             <LastExpandedSection style={{ gap: 20 }}>
                 <QuoteWrapper>
                     <QuoteLabel>{t('parlay-leaderboard.sidebar.total-quote')}:</QuoteLabel>
@@ -653,25 +589,6 @@ const ExpandedRowWrapper = styled.div`
     }
 `;
 
-const ParlayRow = styled(FlexDivRowCentered)`
-    margin-top: 10px;
-    justify-content: space-evenly;
-    &:last-child {
-        margin-bottom: 10px;
-    }
-`;
-
-const ParlayRowText = styled(QuoteText)`
-    max-width: 220px;
-`;
-
-const ParlayRowTeam = styled.span`
-    white-space: nowrap;
-    width: 208px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-`;
-
 const FirstSection = styled.div`
     display: flex;
     flex-direction: column;
@@ -724,6 +641,12 @@ const LeaderboardHeader = styled(FlexDivRow)`
     @media screen and (max-width: 767px) {
         flex-direction: column;
     }
+`;
+
+const FlexCenter = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
 `;
 
 const SelectContainer = styled.div`

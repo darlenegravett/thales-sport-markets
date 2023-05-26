@@ -1,4 +1,5 @@
 import { TAGS_LIST } from '../constants/tags';
+import { fixEnetpulseRacingName } from './formatters/string';
 
 export const getTeamImageSource = (team: string, leagueTag: number) =>
     leagueTag == 9005 ||
@@ -17,13 +18,23 @@ export const getTeamImageSource = (team: string, leagueTag: number) =>
     leagueTag == 18983 ||
     leagueTag == 19138 ||
     leagueTag == 9020 ||
-    leagueTag == 9399
+    leagueTag == 9399 ||
+    leagueTag == 18196 ||
+    leagueTag == 9057 ||
+    leagueTag == 9061 ||
+    leagueTag == 9045 ||
+    leagueTag == 9296 ||
+    leagueTag == 9021
         ? `/logos/${TAGS_LIST.find((t) => t.id == leagueTag)?.label}/${team
               .trim()
               .replaceAll(' ', '-')
               .toLowerCase()}.png`
         : leagueTag == 9153 || leagueTag == 9156
         ? `/logos/Tennis/${team.trim().replaceAll(' ', '-').toLowerCase()}.png`
+        : leagueTag == 9445
+        ? `/logos/${TAGS_LIST.find((t) => t.id == leagueTag)?.label}/${fixEnetpulseRacingName(team)
+              .replaceAll(' ', '-')
+              .toLowerCase()}.png`
         : `/logos/${TAGS_LIST.find((t) => t.id == leagueTag)?.label}/${team
               .trim()
               .replaceAll(' ', '-')

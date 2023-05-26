@@ -9,6 +9,7 @@ export const QUERY_KEYS = {
     ParlayLeaderboard: (networkId: NetworkId, period: number) => ['parlayLeaderboard', period, networkId],
     SportMarkets: (networkId: NetworkId) => ['sportMarkets', networkId],
     SportMarketsNew: (networkId: NetworkId) => ['sportMarketsNew', networkId],
+    SportMarket: (address: string, networkId: NetworkId) => ['sportMarketQuery', address, networkId],
     ParlayAmmData: (networkId: NetworkId) => ['parlayAmmData', networkId],
     Market: (marketAddress: string, networkId: NetworkId) => ['market', marketAddress, networkId],
     LiveResult: (marketId: string) => ['liveResult', marketId],
@@ -33,7 +34,7 @@ export const QUERY_KEYS = {
         networkId: NetworkId
     ) => ['multiplePositionDetails', markets, amounts, stableIndex, networkId],
     AvailablePerPosition: (marketAddress: string) => ['availablePerPosition', marketAddress],
-    AvailablePerPositionMulti: (marketAddresses: ParlaysMarket[]) => ['availablePerPositionMulti', marketAddresses],
+    AvailablePerPositionMulti: (marketAddresses: string) => ['availablePerPositionMulti', marketAddresses],
     AvailablePerDoubleChancePosition: (marketAddress: string) => ['availablePerDoubleChancePosition', marketAddress],
     MarketTransactions: (marketAddress: string, networkId: NetworkId, walletAddress?: string) => [
         'market',
@@ -148,8 +149,10 @@ export const QUERY_KEYS = {
         Data: (networkId: NetworkId) => ['liquidityPool', 'data', networkId],
         UserData: (walletAddress: string, networkId: NetworkId) => ['liquidityPool', 'data', walletAddress, networkId],
         PnL: (networkId: NetworkId) => ['liquidityPool', 'pnl', networkId],
+        Return: (networkId: NetworkId) => ['liquidityPool', 'return', networkId],
         UserTransactions: (networkId: NetworkId) => ['liquidityPool', 'userTransactions', networkId],
     },
+    SGPFees: (networkId: NetworkId) => ['sgpFees', networkId],
 };
 
 export default QUERY_KEYS;

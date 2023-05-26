@@ -4,7 +4,7 @@ import { STATUS_COLOR } from 'constants/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DoubleChanceMarketsInfo, SportMarketInfo } from 'types/markets';
-import { getSpreadTotalText, getVisibilityOfDrawOption } from 'utils/markets';
+import { getSpreadTotalText, getVisibilityOfDrawOption, isMotosport } from 'utils/markets';
 import { Status } from '../MatchStatus/MatchStatus';
 import Odd from '../Odd/Odd';
 import { Container, OddsContainer, Title } from './styled-components';
@@ -33,7 +33,21 @@ const Odds: React.FC<OddsProps> = ({ market, doubleChanceMarkets, isShownInSecon
           ) as DoubleChanceMarketsInfo)
         : undefined;
 
-    return (
+    const areDoubleChanceMarketsOddsValid = doubleChanceMarkets
+        ? doubleChanceMarkets.map((item) => item.homeOdds).every((odd) => odd < 1 && odd != 0)
+        : false;
+
+    const areOddsValid = market.drawOdds
+        ? [market.homeOdds, market.awayOdds, market.drawOdds].every((odd) => odd < 1 && odd != 0)
+        : [market.homeOdds, market.awayOdds].every((odd) => odd < 1 && odd != 0);
+
+    const showContainer = isMotosport(Number(market.tags[0]))
+        ? true
+        : market.betType == BetType.DOUBLE_CHANCE
+        ? areDoubleChanceMarketsOddsValid
+        : areOddsValid;
+
+    return showContainer ? (
         <Container>
             <Title>
                 {t(`markets.market-card.bet-type.${BetTypeNameMap[market.betType as BetType]}`)}
@@ -89,18 +103,22 @@ const Odds: React.FC<OddsProps> = ({ market, doubleChanceMarkets, isShownInSecon
                                     isShownInSecondRow={isShownInSecondRow}
                                 />
                             )}
-                            <Odd
-                                market={market}
-                                position={Position.AWAY}
-                                odd={market.awayOdds}
-                                bonus={market.awayBonus}
-                                isShownInSecondRow={isShownInSecondRow}
-                            />
+                            {!market.isEnetpulseRacing && (
+                                <Odd
+                                    market={market}
+                                    position={Position.AWAY}
+                                    odd={market.awayOdds}
+                                    bonus={market.awayBonus}
+                                    isShownInSecondRow={isShownInSecondRow}
+                                />
+                            )}
                         </>
                     )}
                 </OddsContainer>
             )}
         </Container>
+    ) : (
+        <></>
     );
 };
 

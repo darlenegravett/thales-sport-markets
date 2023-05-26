@@ -1,4 +1,5 @@
 import { CRYPTO_CURRENCY_MAP } from './currency';
+import { BetType } from './tags';
 
 export enum GlobalFiltersEnum {
     OpenMarkets = 'OpenMarkets',
@@ -26,11 +27,11 @@ export enum SportFilterEnum {
     Basketball = 'Basketball',
     Baseball = 'Baseball',
     Hockey = 'Hockey',
-    UFC = 'UFC',
+    MMA = 'MMA',
     Tennis = 'Tennis',
     eSports = 'eSports',
     Cricket = 'Cricket',
-    // Motosport = 'Motosport',
+    Motosport = 'Motosport',
 }
 
 export const COLLATERALS = [
@@ -99,11 +100,26 @@ export const ApexBetTypeKeyMapping = {
     [ApexBetType.TOP10]: 'top10',
 };
 
+export enum ContractSGPOrder {
+    MONEYLINETOTALS = 0,
+    MONEYLINESPREAD = 1,
+    SPREADTOTALS = 2,
+}
+
+export const SGPCombinationsFromContractOrderMapping: Record<ContractSGPOrder, BetType[]> = {
+    [ContractSGPOrder.MONEYLINETOTALS]: [0, 10002],
+    [ContractSGPOrder.MONEYLINESPREAD]: [0, 10001],
+    [ContractSGPOrder.SPREADTOTALS]: [10001, 10002],
+};
+
 export enum ParlayErrorCode {
     NO_ERROS = 0,
     MAX_MATCHES = 1,
     SAME_TEAM_TWICE = 2,
     MAX_DOUBLE_CHANCES = 3,
+    MAX_COMBINED_MARKETS = 4,
+    MAX_NUMBER_OF_MARKETS_WITH_COMBINED_MARKETS = 5,
+    SAME_RACE_DRIVERS = 6,
 }
 
 export const INCENTIVIZED_LEAGUE = {
@@ -120,60 +136,9 @@ export const MIN_LIQUIDITY = 10;
 export const PARLAY_LEADERBOARD_BIWEEKLY_START_DATE = new Date(2023, 2, 1, 0, 0, 0);
 export const PARLAY_LEADERBOARD_BIWEEKLY_START_DATE_UTC = new Date(Date.UTC(2023, 2, 1, 0, 0, 0));
 
-export const PARLAY_LEADERBOARD_FEBRUARY_REWARDS = [
-    750,
-    500,
-    350,
-    260,
-    230,
-    210,
-    200,
-    175,
-    150,
-    125,
-    110,
-    105,
-    100,
-    95,
-    90,
-    85,
-    80,
-    75,
-    70,
-    60,
-    50,
-    50,
-    50,
-    50,
-    50,
-    50,
-    50,
-    50,
-    50,
-    40,
-    40,
-    40,
-    40,
-    40,
-    40,
-    40,
-    40,
-    40,
-    40,
-    30,
-    30,
-    30,
-    30,
-    30,
-    30,
-    30,
-    30,
-    30,
-    30,
-    30,
-];
+export const PARLAY_LEADERBOARD_FIRST_PERIOD_TOP_10_REWARDS = 6;
 
-export const PARLAY_LEADERBOARD_OPTIMISM_REWARDS = [
+export const PARLAY_LEADERBOARD_OPTIMISM_REWARDS_TOP_20 = [
     300,
     200,
     150,
@@ -206,7 +171,7 @@ export const PARLAY_LEADERBOARD_OPTIMISM_REWARDS = [
     20,
 ];
 
-export const PARLAY_LEADERBOARD_ARBITRUM_REWARDS = [
+export const PARLAY_LEADERBOARD_ARBITRUM_REWARDS_TOP_20 = [
     750,
     500,
     375,
@@ -239,6 +204,10 @@ export const PARLAY_LEADERBOARD_ARBITRUM_REWARDS = [
     50,
 ];
 
+export const PARLAY_LEADERBOARD_OPTIMISM_REWARDS_TOP_10 = [250, 175, 125, 100, 85, 70, 60, 50, 45, 40];
+
+export const PARLAY_LEADERBOARD_ARBITRUM_REWARDS_TOP_10 = [250, 175, 125, 100, 85, 70, 60, 50, 45, 40];
+
 export const ENETPULSE_ROUNDS: Record<number, string> = {
     [0]: '',
     [1]: 'no round',
@@ -251,3 +220,12 @@ export const ENETPULSE_ROUNDS: Record<number, string> = {
     [8]: '1/128',
     [9]: 'Final',
 };
+
+export const COMBINED_MARKETS_CONTRACT_DATA_TO_POSITIONS: [0 | 1 | 2, 0 | 1][] = [
+    [0, 0],
+    [0, 1],
+    [1, 0],
+    [1, 1],
+    [2, 0],
+    [2, 1],
+];

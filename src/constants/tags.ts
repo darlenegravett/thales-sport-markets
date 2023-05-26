@@ -125,7 +125,7 @@ export const TAGS_LIST: Tags = [
         logoClass: 'icon-league league--ucl',
         favourite: false,
         hidden: false,
-        priority: 108,
+        priority: 110,
     },
     {
         id: 9017,
@@ -134,7 +134,7 @@ export const TAGS_LIST: Tags = [
         logoClass: 'icon-league league--uel',
         favourite: false,
         hidden: false,
-        priority: 109,
+        priority: 111,
     },
     {
         id: 9018,
@@ -152,10 +152,10 @@ export const TAGS_LIST: Tags = [
         logoClass: 'icon-league league--j1',
         favourite: false,
         hidden: false,
-        priority: 107,
+        priority: 109,
     },
     {
-        id: 9100,
+        id: 9445,
         label: 'Formula 1',
         logo: '/logos/leagueLogos/f1.png',
         logoClass: 'icon-league league--f1',
@@ -230,6 +230,62 @@ export const TAGS_LIST: Tags = [
         hidden: false,
         priority: 303,
     },
+    {
+        id: 18196,
+        label: 'Boxing',
+        logoClass: 'icon-league league--boxing',
+        favourite: false,
+        hidden: false,
+        priority: 602,
+    },
+    {
+        id: 9057,
+        label: 'Eredivisie',
+        logoClass: 'icon-league league--eredivisie',
+        favourite: false,
+        hidden: false,
+        priority: 107,
+    },
+    {
+        id: 9061,
+        label: 'Primeira Liga',
+        logoClass: 'icon-league league--portugal',
+        favourite: false,
+        hidden: false,
+        priority: 108,
+    },
+    {
+        id: 9045,
+        label: 'Copa Libertadores',
+        logoClass: 'icon-league league--copa-libertadores',
+        favourite: false,
+        hidden: false,
+        priority: 112,
+    },
+    {
+        id: 9033,
+        label: 'IIHF World Championship',
+        logoClass: 'icon-league league--iihf',
+        favourite: false,
+        hidden: false,
+        priority: 502,
+    },
+    {
+        id: 9296,
+        label: 'FIFA World Cup U20',
+        logoClass: 'icon-league league--fifa-world-cup-u20',
+        favourite: false,
+        hidden: false,
+        priority: 112,
+    },
+    {
+        id: 9021,
+        label: 'T20 Blast',
+        logoClass: 'icon-league league--t20',
+        favourite: false,
+        hidden: false,
+        priority: 902,
+    },
 ];
 
 export const SPORTS_MAP: SportsMap = {
@@ -239,7 +295,7 @@ export const SPORTS_MAP: SportsMap = {
     9004: 'Basketball',
     9005: 'Basketball',
     9006: 'Hockey',
-    9007: 'UFC',
+    9007: 'MMA',
     9008: 'Basketball',
     9010: 'Soccer',
     9011: 'Soccer',
@@ -251,7 +307,7 @@ export const SPORTS_MAP: SportsMap = {
     9017: 'Soccer',
     9018: 'Soccer',
     9019: 'Soccer',
-    9100: 'Motosport',
+    9445: 'Motosport',
     9101: 'Motosport',
     9153: 'Tennis',
     9156: 'Tennis',
@@ -260,6 +316,13 @@ export const SPORTS_MAP: SportsMap = {
     19138: 'eSports',
     9020: 'Cricket',
     9399: 'Basketball',
+    18196: 'MMA',
+    9057: 'Soccer',
+    9061: 'Soccer',
+    9045: 'Soccer',
+    9033: 'Hockey',
+    9296: 'Soccer',
+    9021: 'Cricket',
 };
 
 export const TAGS_OF_MARKETS_WITHOUT_DRAW_ODDS = [
@@ -271,7 +334,7 @@ export const TAGS_OF_MARKETS_WITHOUT_DRAW_ODDS = [
     9006,
     9008,
     9007,
-    9100,
+    9445,
     9101,
     9153,
     9156,
@@ -280,19 +343,21 @@ export const TAGS_OF_MARKETS_WITHOUT_DRAW_ODDS = [
     19138,
     9020,
     9399,
+    18196,
+    9021,
 ];
 
 export const SPORTS_TAGS_MAP: SportsTagsMap = {
     Football: [9001, 9002],
     Baseball: [9003],
     Basketball: [9004, 9005, 9008, 9399],
-    Hockey: [9006],
-    Soccer: [9010, 9011, 9012, 9013, 9014, 9015, 9016, 9017, 9018, 9019],
-    UFC: [9007],
-    Motosport: [9100, 9101],
+    Hockey: [9006, 9033],
+    Soccer: [9010, 9011, 9012, 9013, 9014, 9015, 9016, 9017, 9018, 9019, 9057, 9061, 9045, 9296],
+    MMA: [9007, 18196],
+    Motosport: [9445, 9101],
     Tennis: [9153, 9156],
     eSports: [18977, 18983, 19138],
-    Cricket: [9020],
+    Cricket: [9020, 9021],
 };
 
 export enum TAGS_FLAGS {
@@ -313,21 +378,32 @@ export enum TAGS_FLAGS {
     UEFA_CL = 9016,
     UEFA_EL = 9017,
     J1_LEAGUE = 9019,
-    FORMULA1 = 9100,
+    FORMULA1 = 9445,
     MOTOGP = 9101,
     CSGO = 18977,
     DOTA2 = 18983,
     LOL = 19138,
     IPL = 9020,
     EUROLEAGUE = 9399,
+    BOXING = 18196,
+    EREDIVISIE = 9057,
+    PRIMEIRA_LIGA = 9061,
+    COPA_LIBERTADORES = 9045,
+    IIHF_WORLD_CHAMPIONSHIP = 9033,
+    FIFA_WORLD_CUP_U20 = 9296,
+    T20_BLAST = 9021,
 }
 
-export const ENETPULSE_SPORTS = [9153, 9156, 18977, 18983, 19138, 9399];
+export const ENETPULSE_SPORTS = [9153, 9156, 18977, 18983, 19138, 9399, 18196, 9057, 9061, 9045, 9445, 9033, 9296];
 
 export const MLS_TAG = 9010;
 export const FIFA_WC_TAG = 9018;
+export const FIFA_WC_U20_TAG = 9296;
+export const IIHF_WC_TAG = 9033;
+export const UEFA_TAGS = [9016, 9017];
+export const MOTOSPORT_TAGS = [9445];
 
-export const PERSON_COMPETITIONS = [9007, 9100, 9101, 9153, 9156];
+export const PERSON_COMPETITIONS = [9007, 9445, 9101, 9153, 9156];
 
 export enum BetType {
     WINNER = 0,
@@ -342,6 +418,11 @@ export const BetTypeNameMap: Record<BetType, string> = {
     [BetType.TOTAL]: 'total',
     [BetType.DOUBLE_CHANCE]: 'double-chance',
 };
+
+export const MARKETS_COMBINATION: Array<BetType>[] = [
+    [0, 10002],
+    [10001, 10002],
+];
 
 export enum DoubleChanceMarketType {
     HOME_TEAM_NOT_TO_LOSE = 'HomeTeamNotToLose',
@@ -368,7 +449,7 @@ export const SCORING_MAP: SportsMap = {
     9017: 'goals',
     9018: 'goals',
     9019: 'goals',
-    9100: '',
+    9445: '',
     9101: '',
     9153: 'gems',
     9156: 'gems',
@@ -377,6 +458,13 @@ export const SCORING_MAP: SportsMap = {
     19138: 'round',
     9020: 'points',
     9399: 'points',
+    18196: '',
+    9057: 'goals',
+    9061: 'goals',
+    9045: 'goals',
+    9033: 'goals',
+    9296: 'goals',
+    9021: 'points',
 };
 
 export const MATCH_RESOLVE_MAP: SportsMap = {
@@ -398,7 +486,7 @@ export const MATCH_RESOLVE_MAP: SportsMap = {
     9017: 'regular',
     9018: 'regular',
     9019: 'regular',
-    9100: '',
+    9445: '',
     9101: '',
     9153: '',
     9156: '',
@@ -407,6 +495,13 @@ export const MATCH_RESOLVE_MAP: SportsMap = {
     19138: '',
     9020: '',
     9399: 'overtime',
+    18196: '',
+    9057: 'regular',
+    9061: 'regular',
+    9045: 'regular',
+    9033: 'regular',
+    9296: 'regular',
+    9021: '',
 };
 
 export const SPORT_PERIODS_MAP: SportsMap = {
@@ -435,4 +530,11 @@ export const SPORT_PERIODS_MAP: SportsMap = {
     19138: 'round',
     9020: 'inning',
     9399: 'quarter',
+    18196: 'round',
+    9057: 'half',
+    9061: 'half',
+    9045: 'half',
+    9033: 'period',
+    9296: 'half',
+    9021: 'inning',
 };
