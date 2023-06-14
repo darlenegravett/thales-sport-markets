@@ -164,7 +164,7 @@ export const TAGS_LIST: Tags = [
         priority: 701,
     },
     {
-        id: 9101,
+        id: 9497,
         label: 'MotoGP',
         logo: `/logos/leagueLogos/motogp.png`,
         logoClass: 'icon-league league--motogp',
@@ -286,6 +286,14 @@ export const TAGS_LIST: Tags = [
         hidden: false,
         priority: 902,
     },
+    {
+        id: 9050,
+        label: 'UEFA EURO Qualifications',
+        logoClass: 'icon-league league--uefa',
+        favourite: false,
+        hidden: false,
+        priority: 113,
+    },
 ];
 
 export const SPORTS_MAP: SportsMap = {
@@ -308,7 +316,7 @@ export const SPORTS_MAP: SportsMap = {
     9018: 'Soccer',
     9019: 'Soccer',
     9445: 'Motosport',
-    9101: 'Motosport',
+    9497: 'Motosport',
     9153: 'Tennis',
     9156: 'Tennis',
     18977: 'eSports',
@@ -323,6 +331,7 @@ export const SPORTS_MAP: SportsMap = {
     9033: 'Hockey',
     9296: 'Soccer',
     9021: 'Cricket',
+    9050: 'Soccer',
 };
 
 export const TAGS_OF_MARKETS_WITHOUT_DRAW_ODDS = [
@@ -335,7 +344,7 @@ export const TAGS_OF_MARKETS_WITHOUT_DRAW_ODDS = [
     9008,
     9007,
     9445,
-    9101,
+    9497,
     9153,
     9156,
     18977,
@@ -352,9 +361,9 @@ export const SPORTS_TAGS_MAP: SportsTagsMap = {
     Baseball: [9003],
     Basketball: [9004, 9005, 9008, 9399],
     Hockey: [9006, 9033],
-    Soccer: [9010, 9011, 9012, 9013, 9014, 9015, 9016, 9017, 9018, 9019, 9057, 9061, 9045, 9296],
+    Soccer: [9010, 9011, 9012, 9013, 9014, 9015, 9016, 9017, 9018, 9019, 9057, 9061, 9045, 9296, 9050],
     MMA: [9007, 18196],
-    Motosport: [9445, 9101],
+    Motosport: [9445, 9497],
     Tennis: [9153, 9156],
     eSports: [18977, 18983, 19138],
     Cricket: [9020, 9021],
@@ -379,7 +388,7 @@ export enum TAGS_FLAGS {
     UEFA_EL = 9017,
     J1_LEAGUE = 9019,
     FORMULA1 = 9445,
-    MOTOGP = 9101,
+    MOTOGP = 9497,
     CSGO = 18977,
     DOTA2 = 18983,
     LOL = 19138,
@@ -392,18 +401,35 @@ export enum TAGS_FLAGS {
     IIHF_WORLD_CHAMPIONSHIP = 9033,
     FIFA_WORLD_CUP_U20 = 9296,
     T20_BLAST = 9021,
+    UEFA_EURO_QUALIFICATIONS = 9050,
 }
 
-export const ENETPULSE_SPORTS = [9153, 9156, 18977, 18983, 19138, 9399, 18196, 9057, 9061, 9045, 9445, 9033, 9296];
+export const ENETPULSE_SPORTS = [
+    9153,
+    9156,
+    18977,
+    18983,
+    19138,
+    9399,
+    18196,
+    9057,
+    9061,
+    9045,
+    9445,
+    9033,
+    9296,
+    9050,
+    9497,
+];
 
 export const MLS_TAG = 9010;
 export const FIFA_WC_TAG = 9018;
 export const FIFA_WC_U20_TAG = 9296;
 export const IIHF_WC_TAG = 9033;
 export const UEFA_TAGS = [9016, 9017];
-export const MOTOSPORT_TAGS = [9445];
+export const MOTOSPORT_TAGS = [9445, 9497];
 
-export const PERSON_COMPETITIONS = [9007, 9445, 9101, 9153, 9156];
+export const PERSON_COMPETITIONS = [9007, 9445, 9497, 9153, 9156];
 
 export enum BetType {
     WINNER = 0,
@@ -450,9 +476,9 @@ export const SCORING_MAP: SportsMap = {
     9018: 'goals',
     9019: 'goals',
     9445: '',
-    9101: '',
-    9153: 'gems',
-    9156: 'gems',
+    9497: '',
+    9153: 'sets',
+    9156: 'sets',
     18977: 'round',
     18983: 'round',
     19138: 'round',
@@ -465,6 +491,7 @@ export const SCORING_MAP: SportsMap = {
     9033: 'goals',
     9296: 'goals',
     9021: 'points',
+    9050: 'goals',
 };
 
 export const MATCH_RESOLVE_MAP: SportsMap = {
@@ -487,7 +514,7 @@ export const MATCH_RESOLVE_MAP: SportsMap = {
     9018: 'regular',
     9019: 'regular',
     9445: '',
-    9101: '',
+    9497: '',
     9153: '',
     9156: '',
     18977: '',
@@ -502,6 +529,7 @@ export const MATCH_RESOLVE_MAP: SportsMap = {
     9033: 'regular',
     9296: 'regular',
     9021: '',
+    9050: 'regular',
 };
 
 export const SPORT_PERIODS_MAP: SportsMap = {
@@ -537,4 +565,5 @@ export const SPORT_PERIODS_MAP: SportsMap = {
     9033: 'period',
     9296: 'half',
     9021: 'inning',
+    9050: 'half',
 };

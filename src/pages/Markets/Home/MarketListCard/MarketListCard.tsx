@@ -283,8 +283,16 @@ const MarketListCard: React.FC<MarketRowCardProps> = ({ market, language }) => {
                 </OddsWrapper>
                 {isGameRegularlyResolved ? (
                     <ResultWrapper>
-                        <ResultLabel>{t('markets.market-card.result')}:</ResultLabel>
-                        <Result>{`${market.homeScore}:${market.awayScore}`}</Result>
+                        <ResultLabel>
+                            {!market.isEnetpulseRacing ? `${t('markets.market-card.result')}:` : ''}
+                        </ResultLabel>
+                        <Result>
+                            {market.isEnetpulseRacing
+                                ? market.homeScore == 1
+                                    ? t('markets.market-card.race-winner')
+                                    : t('markets.market-card.no-win')
+                                : `${market.homeScore} - ${market.awayScore}`}
+                        </Result>
                     </ResultWrapper>
                 ) : (
                     <MatchStatus
@@ -321,6 +329,11 @@ const MarketListCard: React.FC<MarketRowCardProps> = ({ market, language }) => {
                             <OddsWrapper>
                                 <CombinedMarketsOdds market={market} />
                             </OddsWrapper>
+                        </ThirdRowContainer>
+                    )}
+                    {!isMobile && hasCombinedMarkets && doubleChanceMarkets.length > 0 && (
+                        <ThirdRowContainer mobilePaddingRight={isMaxNumberOfChildMarkets ? 4 : 20}>
+                            <CombinedMarketsOdds market={market} />
                         </ThirdRowContainer>
                     )}
                 </>
