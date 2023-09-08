@@ -1,7 +1,6 @@
 import Tooltip from 'components/Tooltip';
 import { oddToastOptions } from 'config/toast';
 import { MIN_LIQUIDITY } from 'constants/markets';
-import { Position } from 'constants/options';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
@@ -36,6 +35,7 @@ import {
     TooltipFooterInfoLabel,
     TooltipBonusText,
 } from './styled-components';
+import { Position } from 'enums/markets';
 
 type CombinedPositionDetailsProps = {
     markets: SportMarketInfo[];
@@ -58,14 +58,15 @@ const CombinedPositionDetails: React.FC<CombinedPositionDetailsProps> = ({
 
     const isAddedToParlay = isSpecificCombinedPositionAddedToParlay(parlay, markets, positions);
 
-    const isGameCancelled = markets[0].isCanceled || (markets[0].isOpen && markets[0].isResolved);
+    const isGameStarted = markets[0].maturityDate < new Date();
+    const isGameCancelled = markets[0].isCanceled || (!isGameStarted && markets[0].isResolved);
     const isGameResolved = markets[0].isResolved || markets[0].isCanceled;
     const isGameRegularlyResolved = markets[0].isResolved && !markets[0].isCanceled;
-    const isPendingResolution = !markets[0].isOpen && !isGameResolved;
+    const isPendingResolution = isGameStarted && !isGameResolved;
     const isGamePaused = markets[0].isPaused && !isGameResolved;
-    const isGameOpen = !markets[0].isResolved && !markets[0].isCanceled && !markets[0].isPaused && markets[0].isOpen;
+    const isGameOpen = !markets[0].isResolved && !markets[0].isCanceled && !markets[0].isPaused && !isGameStarted;
 
-    const noLiquidity = !!availablePerPosition && availablePerPosition < MIN_LIQUIDITY;
+    const noLiquidity = availablePerPosition !== undefined && availablePerPosition < MIN_LIQUIDITY;
     const noOdd = !totalOdd || totalOdd == 0;
     const disabledPosition = noOdd || noLiquidity || !isGameOpen;
 

@@ -1,6 +1,13 @@
 import PositionSymbol from 'components/PositionSymbol';
-import { ENETPULSE_SPORTS, FIFA_WC_TAG, FIFA_WC_U20_TAG, SPORTS_TAGS_MAP, SPORT_PERIODS_MAP } from 'constants/tags';
-import { GAME_STATUS, STATUS_COLOR } from 'constants/ui';
+import {
+    ENETPULSE_SPORTS,
+    FIFA_WC_TAG,
+    FIFA_WC_U20_TAG,
+    JSON_ODDS_SPORTS,
+    SPORTS_TAGS_MAP,
+    SPORT_PERIODS_MAP,
+} from 'constants/tags';
+import { GAME_STATUS } from 'constants/ui';
 import { t } from 'i18next';
 import useEnetpulseAdditionalDataQuery from 'queries/markets/useEnetpulseAdditionalDataQuery';
 import useSportMarketLiveResultQuery from 'queries/markets/useSportMarketLiveResultQuery';
@@ -25,8 +32,11 @@ import {
 } from '../../../SinglePosition/styled-components';
 import { ParlayStatus, Wrapper } from './styled-components';
 import { getCombinedPositionName } from 'utils/combinedMarkets';
+import { ThemeInterface } from 'types/ui';
+import { useTheme } from 'styled-components';
 
 const ParlayCombinedItem: React.FC<{ combinedMarket: CombinedMarket }> = ({ combinedMarket }) => {
+    const theme: ThemeInterface = useTheme();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const selectedOddsType = useSelector(getOddsType);
@@ -52,6 +62,7 @@ const ParlayCombinedItem: React.FC<{ combinedMarket: CombinedMarket }> = ({ comb
     const isPendingResolution = isGameStarted && !isGameResolved;
 
     const isEnetpulseSport = ENETPULSE_SPORTS.includes(Number(market.tags[0]));
+    const isJsonOddsSport = JSON_ODDS_SPORTS.includes(Number(market.tags[0]));
     const gameDate = new Date(market.maturityDate).toISOString().split('T')[0];
 
     const tooltipText = getCombinedOddTooltipText(combinedMarket.markets, combinedMarket.positions);
@@ -65,7 +76,7 @@ const ParlayCombinedItem: React.FC<{ combinedMarket: CombinedMarket }> = ({ comb
     }`;
 
     const useLiveResultQuery = useSportMarketLiveResultQuery(market.id, {
-        enabled: isAppReady && isPendingResolution && !isEnetpulseSport,
+        enabled: isAppReady && isPendingResolution && !isEnetpulseSport && !isJsonOddsSport,
     });
 
     const useEnetpulseLiveResultQuery = useEnetpulseAdditionalDataQuery(market.id, gameDate, market.tags[0], {
@@ -142,7 +153,7 @@ const ParlayCombinedItem: React.FC<{ combinedMarket: CombinedMarket }> = ({ comb
                 />
                 {isPendingResolution && !isMobile ? (
                     isEnetpulseSport ? (
-                        <Status color={STATUS_COLOR.STARTED}>{t('markets.market-card.pending')}</Status>
+                        <Status color={theme.status.started}>{t('markets.market-card.pending')}</Status>
                     ) : (
                         <FlexDivRow>
                             {liveResultInfo?.status != GAME_STATUS.FINAL &&
@@ -201,7 +212,8 @@ const ParlayCombinedItem: React.FC<{ combinedMarket: CombinedMarket }> = ({ comb
 
 const getParlayItemStatus = (market: SportMarketInfo) => {
     if (market.isCanceled) return t('profile.card.canceled');
-    if (market.isResolved) return `${market.homeScore} : ${market.awayScore}`;
+    if (market.isResolved)
+        return market.playerName !== null ? market.playerPropsScore : `${market.homeScore} : ${market.awayScore}`;
     return formatDateWithTime(market.maturityDate);
 };
 

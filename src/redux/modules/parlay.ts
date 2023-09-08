@@ -1,12 +1,13 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { COLLATERALS_INDEX } from 'constants/currency';
-import { ParlayErrorCode } from 'constants/markets';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { MultiSingleAmounts, ParlayPayment, ParlaysMarketPosition, SGPItem } from 'types/markets';
 import localStore from 'utils/localStore';
 import { RootState } from '../rootReducer';
 import { getCombinedMarketsFromParlayData } from 'utils/combinedMarkets';
-import { fixEnetpulseRacingName } from 'utils/formatters/string';
+import { fixOneSideMarketCompetitorName } from 'utils/formatters/string';
+import { GOLF_TAGS } from 'constants/tags';
+import { ParlayErrorCode } from 'enums/markets';
+// import { canPlayerBeAddedToParlay } from 'utils/markets';
 
 const sliceName = 'parlay';
 
@@ -20,12 +21,11 @@ const getDefaultParlay = (): ParlaysMarketPosition[] => {
 };
 
 const getDefaultPayment = (): ParlayPayment => {
-    const lsSelectedStable = localStore.get(LOCAL_STORAGE_KEYS.STABLE_INDEX);
+    const lsSelectedStableIndex = localStore.get(LOCAL_STORAGE_KEYS.STABLE_INDEX);
 
     return {
-        selectedStableIndex:
-            lsSelectedStable !== undefined ? (lsSelectedStable as COLLATERALS_INDEX) : COLLATERALS_INDEX.sUSD,
-        isVoucherSelected: false,
+        selectedStableIndex: lsSelectedStableIndex !== undefined ? (lsSelectedStableIndex as number) : 0,
+        isVoucherSelected: undefined,
         amountToBuy: '',
     };
 };
@@ -72,7 +72,7 @@ const initialState: ParlaySliceState = {
     error: getDefaultError(),
 };
 
-export const parlaySlice = createSlice({
+const parlaySlice = createSlice({
     name: sliceName,
     initialState,
     reducers: {
@@ -93,10 +93,20 @@ export const parlaySlice = createSlice({
                     return;
                 }
             }
-            const multipleDriversAtOneRace = parlayCopy
-                .filter((market) => market.isRacingMarket)
+            const multipleSidesAtOneEvent = parlayCopy
+                .filter((market) => market.isOneSideMarket)
                 .map((market) => market.tag)
                 .findIndex((tag) => tag == action.payload.tag);
+
+            const existingGolfPlayerInParlay = parlayCopy
+                .filter((market) => GOLF_TAGS.includes(Number(market.tag)))
+                .findIndex(
+                    (market) =>
+                        market.homeTeam == action.payload.homeTeam ||
+                        market.homeTeam == action.payload.awayTeam ||
+                        market.awayTeam == action.payload.homeTeam ||
+                        market.awayTeam == action.payload.awayTeam
+                );
 
             if (
                 action.payload.doubleChanceMarketType !== null &&
@@ -105,14 +115,36 @@ export const parlaySlice = createSlice({
             ) {
                 state.error.code = ParlayErrorCode.MAX_DOUBLE_CHANCES;
                 state.error.data = MAX_NUMBER_OF_DOUBLE_CHANCES_ON_PARLAY.toString();
-            } else if (multipleDriversAtOneRace !== -1) {
-                const existingRaceDriver = parlayCopy
-                    .filter((market) => market.isRacingMarket)
-                    .map((market) => market.homeTeam)[multipleDriversAtOneRace];
+            } else if (multipleSidesAtOneEvent !== -1) {
+                const existingSide = parlayCopy
+                    .filter((market) => market.isOneSideMarket)
+                    .map((market) => market.homeTeam)[multipleSidesAtOneEvent];
 
-                state.error.code = ParlayErrorCode.SAME_RACE_DRIVERS;
+                state.error.code = ParlayErrorCode.SAME_EVENT_PARTICIPANT;
                 state.error.data =
-                    fixEnetpulseRacingName(existingRaceDriver) + '/' + fixEnetpulseRacingName(action.payload.homeTeam);
+                    fixOneSideMarketCompetitorName(existingSide) +
+                    '/' +
+                    fixOneSideMarketCompetitorName(action.payload.homeTeam);
+            } else if (existingGolfPlayerInParlay != -1) {
+                const existingHomeSide = parlayCopy
+                    .filter((market) => GOLF_TAGS.includes(Number(market.tag)))
+                    .map((market) => market.homeTeam)[existingGolfPlayerInParlay];
+
+                const existingAwaySide = parlayCopy
+                    .filter((market) => GOLF_TAGS.includes(Number(market.tag)))
+                    .map((market) => market.awayTeam)[existingGolfPlayerInParlay];
+
+                const existingSides =
+                    action.payload.homeTeam == existingHomeSide
+                        ? existingHomeSide
+                        : action.payload.homeTeam == existingAwaySide
+                        ? existingAwaySide
+                        : action.payload.awayTeam == existingHomeSide
+                        ? existingHomeSide
+                        : existingAwaySide;
+
+                state.error.code = ParlayErrorCode.UNIQUE_TOURNAMENT_PLAYERS;
+                state.error.data = fixOneSideMarketCompetitorName(existingSides);
             } else if (index === -1) {
                 // ADD new market
                 if (state.parlay.length < state.parlaySize) {
@@ -139,6 +171,18 @@ export const parlaySlice = createSlice({
                     state.error.code = ParlayErrorCode.MAX_MATCHES;
                     state.error.data = state.parlaySize.toString();
                 }
+                //  else if (state.parlay.length < state.parlaySize) {
+                //         state.multiSingle.push({
+                //             sportMarketAddress: action.payload.sportMarketAddress,
+                //             parentMarketAddress: action.payload.parentMarket,
+                //             amountToBuy: 0,
+                //         });
+                //         state.parlay.push(action.payload);
+                //     } else {
+                //         state.error.code = ParlayErrorCode.MAX_MATCHES;
+                //         state.error.data = state.parlaySize.toString();
+                //     }
+                // }
             } else {
                 // UPDATE market position
                 parlayCopy[index].sportMarketAddress = action.payload.sportMarketAddress;
@@ -152,6 +196,8 @@ export const parlaySlice = createSlice({
                 multiSingleCopy[index].amountToBuy = 0;
                 state.multiSingle = [...multiSingleCopy];
             }
+
+            //  else if (action.payload.playerId && canPlayerBeAddedToParlay(state.parlay, action.payload)) {
 
             localStore.set(LOCAL_STORAGE_KEYS.PARLAY, state.parlay);
             localStore.set(LOCAL_STORAGE_KEYS.MULTI_SINGLE, state.multiSingle);
@@ -176,16 +222,8 @@ export const parlaySlice = createSlice({
                 localStore.set(LOCAL_STORAGE_KEYS.IS_MULTI_SINGLE, false);
             }
 
-            // action.payload.forEach((item) => {
-            //     state.multiSingle.push({
-            //         sportMarketAddress: item.sportMarketAddress,
-            //         amountToBuy: 0,
-            //     });
-            // });
-
             state.parlay.push(...action.payload);
             localStore.set(LOCAL_STORAGE_KEYS.PARLAY, state.parlay);
-            // localStore.set(LOCAL_STORAGE_KEYS.MULTI_SINGLE, state.multiSingle);
         },
         setParlaySize: (state, action: PayloadAction<number>) => {
             state.parlaySize = action.payload;
@@ -258,11 +296,7 @@ export const parlaySlice = createSlice({
             }
             localStore.set(LOCAL_STORAGE_KEYS.MULTI_SINGLE, state.multiSingle);
         },
-        removeFromMultiSingle: (state, action: PayloadAction<string>) => {
-            state.multiSingle = state.multiSingle.filter((ms) => ms.sportMarketAddress !== action.payload);
-            localStore.set(LOCAL_STORAGE_KEYS.MULTI_SINGLE, state.multiSingle);
-        },
-        setPaymentSelectedStableIndex: (state, action: PayloadAction<COLLATERALS_INDEX>) => {
+        setPaymentSelectedStableIndex: (state, action: PayloadAction<number>) => {
             state.payment = { ...state.payment, selectedStableIndex: action.payload };
         },
         resetParlayError: (state) => {
@@ -274,12 +308,6 @@ export const parlaySlice = createSlice({
         },
     },
 });
-
-export const getLastSavedOrDefaultStableIndex = (): COLLATERALS_INDEX => {
-    const lsSelectedStable = localStore.get(LOCAL_STORAGE_KEYS.STABLE_INDEX);
-
-    return lsSelectedStable !== undefined ? (lsSelectedStable as COLLATERALS_INDEX) : COLLATERALS_INDEX.sUSD;
-};
 
 export const {
     updateParlay,
@@ -294,10 +322,9 @@ export const {
     setPaymentSelectedStableIndex,
     resetParlayError,
     setSGPFees,
-    removeFromMultiSingle,
 } = parlaySlice.actions;
 
-export const getParlayState = (state: RootState) => state[sliceName];
+const getParlayState = (state: RootState) => state[sliceName];
 export const getParlay = (state: RootState) => getParlayState(state).parlay;
 export const getMultiSingle = (state: RootState) => getParlayState(state).multiSingle;
 export const getIsMultiSingle = (state: RootState) => getParlayState(state).isMultiSingle;
@@ -305,6 +332,5 @@ export const getParlaySize = (state: RootState) => getParlayState(state).parlayS
 export const getParlayPayment = (state: RootState) => getParlayState(state).payment;
 export const getParlayError = (state: RootState) => getParlayState(state).error;
 export const getHasParlayError = createSelector(getParlayError, (error) => error.code != ParlayErrorCode.NO_ERROS);
-export const getSGPFees = (state: RootState) => getParlayState(state).sgpFees;
 
 export default parlaySlice.reducer;

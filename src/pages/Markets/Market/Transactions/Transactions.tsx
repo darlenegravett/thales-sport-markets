@@ -17,8 +17,7 @@ import {
     SportMarketInfo,
 } from 'types/markets';
 import useClaimTransactionsPerMarket from 'queries/markets/useClaimTransactionsPerMarket';
-import { convertFinalResultToResultType } from 'utils/markets';
-import { SPORTS_TAGS_MAP, ENETPULSE_SPORTS } from 'constants/tags';
+import { convertFinalResultToResultType, getIsOneSideMarket } from 'utils/markets';
 
 type TransactionsProps = {
     market: SportMarketInfo;
@@ -42,10 +41,7 @@ const Transactions: React.FC<TransactionsProps> = ({ market }) => {
 
         if (marketClaimTransactionsQuery.isSuccess && marketClaimTransactionsQuery.data) {
             marketClaimTransactionsQuery.data.forEach((claimTx: ClaimTransaction) => {
-                claimTx.market.isEnetpulseRacing =
-                    SPORTS_TAGS_MAP['Motosport'].includes(Number(market.tags[0])) &&
-                    ENETPULSE_SPORTS.includes(Number(market.tags[0]));
-
+                claimTx.market.isOneSideMarket = getIsOneSideMarket(Number(market.tags[0]));
                 return data.push({
                     hash: claimTx.id,
                     type: 'claim' as MarketTransactionType,
@@ -63,9 +59,7 @@ const Transactions: React.FC<TransactionsProps> = ({ market }) => {
 
         if (marketTransactionsQuery.isSuccess && marketTransactionsQuery.data) {
             marketTransactionsQuery.data.forEach((marketTransaction: MarketTransaction) => {
-                marketTransaction.wholeMarket.isEnetpulseRacing =
-                    SPORTS_TAGS_MAP['Motosport'].includes(Number(market.tags[0])) &&
-                    ENETPULSE_SPORTS.includes(Number(market.tags[0]));
+                marketTransaction.wholeMarket.isOneSideMarket = getIsOneSideMarket(Number(market.tags[0]));
                 return data.push({
                     hash: marketTransaction.hash,
                     type: marketTransaction.type,
@@ -139,23 +133,6 @@ const Container = styled(FlexDivColumn)`
 
 const TableContainer = styled(FlexDivColumn)`
     overflow: auto;
-    ::-webkit-scrollbar {
-        width: 5px;
-    }
-    ::-webkit-scrollbar-track {
-        background: #04045a;
-        border-radius: 8px;
-    }
-    ::-webkit-scrollbar-thumb {
-        border-radius: 15px;
-        background: #355dff;
-    }
-    ::-webkit-scrollbar-thumb:active {
-        background: #44e1e2;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-        background: rgb(67, 116, 255);
-    }
 `;
 
 export default Transactions;

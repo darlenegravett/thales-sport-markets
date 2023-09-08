@@ -1,6 +1,14 @@
 import PositionSymbol from 'components/PositionSymbol';
-import { ENETPULSE_SPORTS, FIFA_WC_TAG, FIFA_WC_U20_TAG, SPORTS_TAGS_MAP, SPORT_PERIODS_MAP } from 'constants/tags';
-import { GAME_STATUS, STATUS_COLOR } from 'constants/ui';
+import {
+    BetTypeNameMap,
+    ENETPULSE_SPORTS,
+    FIFA_WC_TAG,
+    FIFA_WC_U20_TAG,
+    JSON_ODDS_SPORTS,
+    SPORTS_TAGS_MAP,
+    SPORT_PERIODS_MAP,
+} from 'constants/tags';
+import { GAME_STATUS } from 'constants/ui';
 import { t } from 'i18next';
 import useEnetpulseAdditionalDataQuery from 'queries/markets/useEnetpulseAdditionalDataQuery';
 import useSportMarketLiveResultQuery from 'queries/markets/useSportMarketLiveResultQuery';
@@ -29,14 +37,18 @@ import {
     Status,
     TeamScoreLabel,
 } from '../../../SinglePosition/styled-components';
-import { ParlayStatus, Wrapper } from './styled-components';
-import { fixEnetpulseRacingName } from 'utils/formatters/string';
+import { ParlayStatus, PlayerIcon, Wrapper } from './styled-components';
+import { fixOneSideMarketCompetitorName } from 'utils/formatters/string';
+import { ThemeInterface } from 'types/ui';
+import { useTheme } from 'styled-components';
+import { BetType } from 'enums/markets';
 
 const ParlayItem: React.FC<{ market: SportMarketInfo; position: PositionData | undefined; quote: number }> = ({
     market,
     position,
     quote,
 }) => {
+    const theme: ThemeInterface = useTheme();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const selectedOddsType = useSelector(getOddsType);
@@ -63,10 +75,11 @@ const ParlayItem: React.FC<{ market: SportMarketInfo; position: PositionData | u
     const isPendingResolution = isGameStarted && !isGameResolved;
 
     const isEnetpulseSport = ENETPULSE_SPORTS.includes(Number(market.tags[0]));
+    const isJsonOddsSport = JSON_ODDS_SPORTS.includes(Number(market.tags[0]));
     const gameDate = new Date(market.maturityDate).toISOString().split('T')[0];
 
     const useLiveResultQuery = useSportMarketLiveResultQuery(market.id, {
-        enabled: isAppReady && isPendingResolution && !isEnetpulseSport,
+        enabled: isAppReady && isPendingResolution && !isEnetpulseSport && !isJsonOddsSport,
     });
 
     const useEnetpulseLiveResultQuery = useEnetpulseAdditionalDataQuery(market.id, gameDate, market.tags[0], {
@@ -96,15 +109,20 @@ const ParlayItem: React.FC<{ market: SportMarketInfo; position: PositionData | u
         <Wrapper style={{ opacity: market.isCanceled ? 0.5 : 1 }}>
             <MatchInfo>
                 <MatchLogo>
-                    <ClubLogo
-                        alt={market.homeTeam}
-                        src={homeLogoSrc}
-                        isFlag={market.tags[0] == FIFA_WC_TAG || market.tags[0] == FIFA_WC_U20_TAG}
-                        losingTeam={false}
-                        onError={getOnImageError(setHomeLogoSrc, market.tags[0])}
-                        customMobileSize={'30px'}
-                    />
-                    {!market.isEnetpulseRacing && (
+                    {market.playerName === null ? (
+                        <ClubLogo
+                            alt={market.homeTeam}
+                            src={homeLogoSrc}
+                            isFlag={market.tags[0] == FIFA_WC_TAG || market.tags[0] == FIFA_WC_U20_TAG}
+                            losingTeam={false}
+                            onError={getOnImageError(setHomeLogoSrc, market.tags[0])}
+                            customMobileSize={'30px'}
+                        />
+                    ) : (
+                        <PlayerIcon className="icon icon--profile" />
+                    )}
+
+                    {!market.isOneSideMarket && market.playerName === null && (
                         <ClubLogo
                             awayTeam={true}
                             alt={market.awayTeam}
@@ -117,10 +135,14 @@ const ParlayItem: React.FC<{ market: SportMarketInfo; position: PositionData | u
                     )}
                 </MatchLogo>
                 <MatchLabel>
-                    <ClubName isRacing={market.isEnetpulseRacing}>
-                        {market.isEnetpulseRacing ? fixEnetpulseRacingName(market.homeTeam) : market.homeTeam}
+                    <ClubName isOneSided={market.isOneSideMarket}>
+                        {market.playerName === null
+                            ? market.isOneSideMarket
+                                ? fixOneSideMarketCompetitorName(market.homeTeam)
+                                : market.homeTeam
+                            : `${market.playerName} (${BetTypeNameMap[market.betType as BetType]})`}
                     </ClubName>
-                    {!market.isEnetpulseRacing && <ClubName>{market.awayTeam}</ClubName>}
+                    {!market.isOneSideMarket && market.playerName === null && <ClubName>{market.awayTeam}</ClubName>}
                 </MatchLabel>
             </MatchInfo>
             <StatusContainer>
@@ -143,11 +165,11 @@ const ParlayItem: React.FC<{ market: SportMarketInfo; position: PositionData | u
                             : undefined
                     }
                     tooltip={<>{getOddTooltipText(positionEnum, market)}</>}
-                    additionalStyle={market.isEnetpulseRacing ? { fontSize: 11 } : {}}
+                    additionalStyle={market.isOneSideMarket ? { fontSize: 11 } : {}}
                 />
                 {isPendingResolution && !isMobile ? (
                     isEnetpulseSport ? (
-                        <Status color={STATUS_COLOR.STARTED}>{t('markets.market-card.pending')}</Status>
+                        <Status color={theme.status.started}>{t('markets.market-card.pending')}</Status>
                     ) : (
                         <FlexDivRow>
                             {liveResultInfo?.status != GAME_STATUS.FINAL &&
@@ -206,7 +228,8 @@ const ParlayItem: React.FC<{ market: SportMarketInfo; position: PositionData | u
 
 const getParlayItemStatus = (market: SportMarketInfo) => {
     if (market.isCanceled) return t('profile.card.canceled');
-    if (market.isResolved) return `${market.homeScore} : ${market.awayScore}`;
+    if (market.isResolved)
+        return market.playerName !== null ? market.playerPropsScore : `${market.homeScore} : ${market.awayScore}`;
     return formatDateWithTime(market.maturityDate);
 };
 

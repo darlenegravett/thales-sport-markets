@@ -28,7 +28,7 @@ import {
     getSpreadTotalText,
     getSymbolText,
 } from 'utils/markets';
-import { NetworkIdByName } from 'utils/network';
+import { Network } from 'enums/network';
 import { buildHref } from 'utils/routes';
 import {
     ArrowIcon,
@@ -53,9 +53,12 @@ import {
     Title,
     TitleLabel,
 } from './styled-components';
+import { ThemeInterface } from 'types/ui';
+import { useTheme } from 'styled-components';
 
 const SidebarLeaderboard: React.FC = () => {
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const networkId = useSelector((state: RootState) => getNetworkId(state));
     const selectedOddsType = useSelector(getOddsType);
@@ -70,7 +73,7 @@ const SidebarLeaderboard: React.FC = () => {
     }, [query.isSuccess, query.data]);
 
     const rewards =
-        networkId !== NetworkIdByName.ArbitrumOne
+        networkId !== Network.ArbitrumOne
             ? PARLAY_LEADERBOARD_OPTIMISM_REWARDS_TOP_10
             : PARLAY_LEADERBOARD_ARBITRUM_REWARDS_TOP_10;
 
@@ -131,7 +134,7 @@ const SidebarLeaderboard: React.FC = () => {
                                         <ColumnWrapper>
                                             <DataLabel>
                                                 {formatCurrency(rewards[parlay.rank - 1], 0)}
-                                                {networkId !== NetworkIdByName.ArbitrumOne ? (
+                                                {networkId !== Network.ArbitrumOne ? (
                                                     <OPLogoWrapper />
                                                 ) : (
                                                     <ArbitrumLogoWrapper />
@@ -171,7 +174,7 @@ const SidebarLeaderboard: React.FC = () => {
                                                             key={'ExpandedRow' + marketIndex}
                                                         >
                                                             <ParlayRowMatch>
-                                                                {getPositionStatus(position)}
+                                                                {getPositionStatus(position, theme)}
                                                                 <ParlayRowTeam
                                                                     title={
                                                                         position.market.homeTeam +
@@ -209,7 +212,9 @@ const SidebarLeaderboard: React.FC = () => {
                                                                         ? {
                                                                               text: spreadTotalText,
                                                                               textStyle: {
-                                                                                  backgroundColor: '#2c3250',
+                                                                                  backgroundColor:
+                                                                                      theme.oddsGradiendBackground
+                                                                                          .tertiary,
                                                                                   fontSize: '10px',
                                                                                   top: '-9px',
                                                                                   left: '10px',

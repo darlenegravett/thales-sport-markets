@@ -1,4 +1,3 @@
-import { MAIN_COLORS } from 'constants/ui';
 import styled from 'styled-components';
 import {
     FlexDivCentered,
@@ -12,7 +11,7 @@ import { Value } from '../ParlayPosition/styled-components';
 
 export const Wrapper = styled(FlexDivRow)`
     align-items: center;
-    background-color: ${MAIN_COLORS.LIGHT_GRAY};
+    background-color: ${(props) => props.theme.background.secondary};
     border-radius: 4px;
     padding: 7px 10px;
     width: 100%;
@@ -67,7 +66,7 @@ export const MatchPeriodLabel = styled.span`
     text-transform: uppercase;
     white-space: nowrap;
     &.blink {
-        color: #e26a78;
+        color: ${(props) => props.theme.status.loss};
         animation: blinker 1.5s step-start infinite;
         font-weight: 700;
     }
@@ -79,7 +78,7 @@ export const MatchPeriodLabel = styled.span`
     }
 
     &.red {
-        color: #e26a78;
+        color: ${(props) => props.theme.status.loss};
     }
 `;
 
@@ -105,4 +104,10 @@ export const Status = styled.span<{ color: string }>`
     color: ${(props) => props.color};
     align-self: center;
     justify-content: space-evenly;
+`;
+
+export const PlayerIcon = styled.i`
+    font-size: 40px;
+    color: ${(props) => props.theme.textColor.secondary};
+    margin-left: 24px;
 `;

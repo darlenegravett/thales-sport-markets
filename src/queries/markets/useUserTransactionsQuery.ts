@@ -2,12 +2,13 @@ import { useQuery, UseQueryOptions } from 'react-query';
 import thalesData from 'thales-data';
 import QUERY_KEYS from 'constants/queryKeys';
 import { MarketTransaction, MarketTransactions } from 'types/markets';
-import { NetworkId } from 'types/network';
-import { Position } from 'constants/options';
+import { Network } from 'enums/network';
+import { Position } from 'enums/markets';
+import { getIsOneSideMarket } from '../../utils/markets';
 
 const useUserTransactionsQuery = (
     walletAddress: string,
-    networkId: NetworkId,
+    networkId: Network,
     options?: UseQueryOptions<MarketTransactions>
 ) => {
     return useQuery<MarketTransactions>(
@@ -18,7 +19,11 @@ const useUserTransactionsQuery = (
                     account: walletAddress,
                     network: networkId,
                 });
-                return marketTransactions.map((tx: MarketTransaction) => ({ ...tx, position: Position[tx.position] }));
+
+                return marketTransactions.map((tx: MarketTransaction) => {
+                    tx.wholeMarket.isOneSideMarket = getIsOneSideMarket(Number(tx.wholeMarket.tags[0]));
+                    return { ...tx, position: Position[tx.position] };
+                });
             } catch (e) {
                 console.log(e);
                 return [];

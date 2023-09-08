@@ -1,98 +1,37 @@
-import { APEX_GAME_MIN_TAG, ApexBetType, MarketStatus, OddsType } from 'constants/markets';
-import { Position } from 'constants/options';
 import {
-    BetType,
-    DoubleChanceMarketType,
+    BetTypeNameMap,
     FIFA_WC_TAG,
     FIFA_WC_U20_TAG,
+    GOLF_TAGS,
+    GOLF_TOURNAMENT_WINNER_TAG,
     IIHF_WC_TAG,
     MATCH_RESOLVE_MAP,
-    MLS_TAG,
     MOTOSPORT_TAGS,
-    PERSON_COMPETITIONS,
     SCORING_MAP,
+    SPORTS_TAGS_MAP,
     TAGS_OF_MARKETS_WITHOUT_DRAW_ODDS,
     UEFA_TAGS,
 } from 'constants/tags';
 import i18n from 'i18n';
-import ordinal from 'ordinal';
 import { AccountPositionProfile } from 'queries/markets/useAccountMarketsQuery';
 import {
-    AccountPosition,
     CombinedMarketsPositionName,
     MarketData,
-    MarketInfo,
     ParlayMarket,
     ParlayMarketWithQuotes,
     ParlayMarketWithRound,
     ParlaysMarket,
+    ParlaysMarketPosition,
     PositionData,
     SportMarketInfo,
 } from 'types/markets';
 import { addDaysToEnteredTimestamp } from './formatters/date';
 import { formatCurrency } from './formatters/number';
-import { fixEnetpulseRacingName } from './formatters/string';
+import { fixOneSideMarketCompetitorName } from './formatters/string';
+import { BetType, DoubleChanceMarketType, OddsType, PLAYER_PROPS_BET_TYPES, Position } from 'enums/markets';
+import { PARLAY_MAXIMUM_QUOTE } from '../constants/markets';
 
 const EXPIRE_SINGLE_SPORT_MARKET_PERIOD_IN_DAYS = 90;
-
-export const getRoi = (ticketPrice: number, potentialWinnings: number, showRoi: boolean) =>
-    showRoi ? (potentialWinnings - ticketPrice) / ticketPrice : 0;
-
-export const isClaimAvailable = (accountPositions?: AccountPosition[]) => {
-    let isClaimAvailable = false;
-    accountPositions?.forEach((accountPosition) =>
-        accountPosition.claimable && accountPosition.amount > 0 ? (isClaimAvailable = true) : ''
-    );
-    return isClaimAvailable;
-};
-
-export const getMarketStatus = (market: MarketInfo) => {
-    if (market.isPaused) {
-        return MarketStatus.Paused;
-    } else {
-        if (market.isResolved) {
-            if (market.winningPosition === 0) {
-                if (market.canUsersClaim || market.cancelledByCreator) {
-                    return MarketStatus.CancelledConfirmed;
-                } else {
-                    return MarketStatus.CancelledPendingConfirmation;
-                }
-            } else {
-                if (market.canUsersClaim) {
-                    return MarketStatus.ResolvedConfirmed;
-                } else {
-                    return MarketStatus.ResolvedPendingConfirmation;
-                }
-            }
-        } else {
-            if (market.canMarketBeResolved) {
-                return MarketStatus.ResolvePending;
-            } else {
-                return MarketStatus.Open;
-            }
-        }
-    }
-};
-
-export const getMarketStatusFromMarketData = (market: MarketData) => {
-    if (market.gameStarted && !market.resolved) return MarketStatus.ResolvePending;
-    if (market.paused) return MarketStatus.Paused;
-    if (market.resolved) return MarketStatus.ResolvedConfirmed;
-    if (market.cancelled) return MarketStatus.CancelledConfirmed;
-    return MarketStatus.Open;
-};
-
-export const isValidHttpsUrl = (text: string) => {
-    let url;
-
-    try {
-        url = new URL(text);
-    } catch (_) {
-        return false;
-    }
-
-    return url.protocol === 'https:';
-};
 
 export const convertFinalResultToResultType = (result: number, isApexTopGame?: boolean) => {
     if (result == 1 && isApexTopGame) return 3;
@@ -101,15 +40,6 @@ export const convertFinalResultToResultType = (result: number, isApexTopGame?: b
     if (result == 2) return 1;
     if (result == 3) return 2;
     return -1;
-};
-
-export const convertPositionToSymbolType = (position: Position, isApexTopGame: boolean) => {
-    if (position == Position.HOME && isApexTopGame) return 3;
-    if (position == Position.AWAY && isApexTopGame) return 4;
-    if (position == Position.HOME) return 0;
-    if (position == Position.AWAY) return 1;
-    if (position == Position.DRAW) return 2;
-    return 0;
 };
 
 export const getSymbolText = (
@@ -121,7 +51,7 @@ export const getSymbolText = (
         return combinedMarketPositionSymbol;
     }
 
-    if (market.isEnetpulseRacing) {
+    if (market.isOneSideMarket) {
         return 'YES';
     }
     switch (position) {
@@ -130,6 +60,12 @@ export const getSymbolText = (
                 case BetType.SPREAD:
                     return 'H1';
                 case BetType.TOTAL:
+                case BetType.PLAYER_PROPS_STRIKEOUTS:
+                case BetType.PLAYER_PROPS_HOMERUNS:
+                case BetType.PLAYER_PROPS_PASSING_YARDS:
+                case BetType.PLAYER_PROPS_RUSHING_YARDS:
+                case BetType.PLAYER_PROPS_RECEIVING_YARDS:
+                case BetType.PLAYER_PROPS_PASSING_TOUCHDOWNS:
                     return 'O';
                 case BetType.DOUBLE_CHANCE:
                     switch (market.doubleChanceMarketType) {
@@ -150,6 +86,12 @@ export const getSymbolText = (
                 case BetType.SPREAD:
                     return 'H2';
                 case BetType.TOTAL:
+                case BetType.PLAYER_PROPS_STRIKEOUTS:
+                case BetType.PLAYER_PROPS_HOMERUNS:
+                case BetType.PLAYER_PROPS_PASSING_YARDS:
+                case BetType.PLAYER_PROPS_RECEIVING_YARDS:
+                case BetType.PLAYER_PROPS_PASSING_TOUCHDOWNS:
+                case BetType.PLAYER_PROPS_RUSHING_YARDS:
                     return 'U';
                 default:
                     return '2';
@@ -169,22 +111,47 @@ export const getSpreadTotalText = (market: SportMarketInfo | MarketData, positio
                 : `${Number(market.spread) > 0 ? '-' : '+'}${Math.abs(Number(market.spread)) / 100}`;
         case BetType.TOTAL:
             return `${Number(market.total) / 100}`;
+        case BetType.PLAYER_PROPS_STRIKEOUTS:
+        case BetType.PLAYER_PROPS_HOMERUNS:
+        case BetType.PLAYER_PROPS_PASSING_YARDS:
+        case BetType.PLAYER_PROPS_PASSING_TOUCHDOWNS:
+        case BetType.PLAYER_PROPS_RUSHING_YARDS:
+            return `${Number(market.playerPropsLine)}`;
         default:
             return undefined;
     }
 };
 
-export const getSpreadText = (market: SportMarketInfo, position: Position) => {
+export const getTotalText = (market: SportMarketInfo) => {
+    if (market.betType == BetType.TOTAL) return `${Number(market.total) / 100}`;
+    return undefined;
+};
+
+export const getMarketName = (market: SportMarketInfo | MarketData, position?: Position) => {
+    if (market.isOneSideMarket) return fixOneSideMarketCompetitorName(market.homeTeam);
+    switch (Number(market.betType)) {
+        case BetType.WINNER:
+        case BetType.SPREAD:
+        case BetType.TOTAL:
+        case BetType.DOUBLE_CHANCE:
+            return position === Position.HOME ? market.homeTeam : market.awayTeam;
+        case BetType.PLAYER_PROPS_STRIKEOUTS:
+        case BetType.PLAYER_PROPS_HOMERUNS:
+        case BetType.PLAYER_PROPS_PASSING_YARDS:
+        case BetType.PLAYER_PROPS_PASSING_TOUCHDOWNS:
+        case BetType.PLAYER_PROPS_RUSHING_YARDS:
+            return `${market.playerName} \n(${BetTypeNameMap[market.betType as BetType]})`;
+        default:
+            return undefined;
+    }
+};
+
+const getSpreadText = (market: SportMarketInfo, position: Position) => {
     if (market.betType == BetType.SPREAD) {
         return position === Position.HOME
             ? `${Number(market.spread) > 0 ? '+' : '-'}${Math.abs(Number(market.spread)) / 100}`
             : `${Number(market.spread) > 0 ? '-' : '+'}${Math.abs(Number(market.spread)) / 100}`;
     }
-    return undefined;
-};
-
-export const getTotalText = (market: SportMarketInfo) => {
-    if (market.betType == BetType.TOTAL) return `${Number(market.total) / 100}`;
     return undefined;
 };
 
@@ -197,8 +164,8 @@ export const getSpreadAndTotalTextForCombinedMarket = (
         spread: '',
     };
 
-    const totalMarket = markets.find((_market) => _market.betType == BetType.TOTAL);
-    const spreadMarket = markets.findIndex((_market) => _market.betType == BetType.SPREAD);
+    const totalMarket = markets.find((market) => market.betType == BetType.TOTAL);
+    const spreadMarket = markets.findIndex((market) => market.betType == BetType.SPREAD);
 
     if (totalMarket) result.total = (getTotalText(totalMarket) ? getTotalText(totalMarket) : '') as string;
     if (spreadMarket !== -1)
@@ -228,22 +195,6 @@ export const formatMarketOdds = (oddsType: OddsType, odds: number | undefined) =
     }
 };
 
-export const convertFinalResultToWinnerName = (result: number, market: MarketData) => {
-    if (result == 1 && getIsApexTopGame(market.isApex, market.betType)) return 'YES';
-    if (result == 1 && getIsApexTopGame(market.isApex, market.betType)) return 'NO';
-    if (result == 1) return market.homeTeam;
-    if (result == 2) return market.awayTeam;
-    if (result == 3) return 'DRAW';
-};
-
-export const convertPositionToTeamName = (result: number, market: MarketData) => {
-    if (result == 0 && getIsApexTopGame(market.isApex, market.betType)) return 'YES';
-    if (result == 1 && getIsApexTopGame(market.isApex, market.betType)) return 'NO';
-    if (result == 0) return market.homeTeam;
-    if (result == 1) return market.awayTeam;
-    if (result == 2) return 'DRAW';
-};
-
 export const convertPositionNameToPosition = (positionName: string) => {
     if (positionName?.toUpperCase() == 'HOME') return 0;
     if (positionName?.toUpperCase() == 'AWAY') return 1;
@@ -258,13 +209,6 @@ export const convertPositionNameToPositionType = (positionName: string) => {
     return Position.HOME;
 };
 
-export const convertPositionToPositionName = (position: number): 'HOME' | 'AWAY' | 'DRAW' => {
-    if (position == 0) return 'HOME';
-    if (position == 1) return 'AWAY';
-    if (position == 2) return 'DRAW';
-    return 'HOME';
-};
-
 export const getCanceledGameClaimAmount = (position: AccountPositionProfile) => {
     const positionType = convertPositionNameToPositionType(position.side);
 
@@ -273,49 +217,6 @@ export const getCanceledGameClaimAmount = (position: AccountPositionProfile) => 
     if (positionType == Position.DRAW) return position.market.drawOdds ? position.market.drawOdds * position.amount : 0;
     return 0;
 };
-
-export const isApexGame = (tag: number) => tag >= APEX_GAME_MIN_TAG;
-
-export const getScoreForApexGame = (resultDetails: string, defaultHomeScore: string, defaultAwayScore: string) => {
-    if (resultDetails !== null && resultDetails.indexOf('/')) {
-        const splittedResultDetails = resultDetails.split('/');
-        let homeScore = splittedResultDetails[0];
-        let awayScore = splittedResultDetails[1];
-        if (!isNaN(parseInt(homeScore))) {
-            homeScore = ordinal(Number(homeScore));
-        }
-        if (!isNaN(parseInt(awayScore))) {
-            awayScore = ordinal(Number(awayScore));
-        }
-        return {
-            homeScore,
-            awayScore,
-        };
-    }
-
-    return {
-        homeScore: defaultHomeScore,
-        awayScore: defaultAwayScore,
-    };
-};
-
-export const appplyLogicForApexGame = (market: SportMarketInfo) => {
-    // parse result and set score
-    const score = getScoreForApexGame(market.resultDetails, market.homeScore.toString(), market.awayScore.toString());
-    market.homeScore = score.homeScore;
-    market.awayScore = score.awayScore;
-
-    // show market as paused if there are no new odds for post qualifying phase
-    market.isPaused =
-        !!market.qualifyingStartTime &&
-        market.qualifyingStartTime < new Date().getTime() &&
-        market.maturityDate.getTime() > new Date().getTime() &&
-        !market.arePostQualifyingOddsFetched;
-    return market;
-};
-
-export const getIsApexTopGame = (isApex: boolean, betType: ApexBetType) =>
-    isApex && (betType === ApexBetType.TOP3 || betType === ApexBetType.TOP5 || betType === ApexBetType.TOP10);
 
 export const getPositionOdds = (market: ParlaysMarket) => {
     return market.position === Position.HOME
@@ -327,27 +228,15 @@ export const getPositionOdds = (market: ParlaysMarket) => {
         : 0;
 };
 
-export const getPositionOddsFromSportMarket = (market: SportMarketInfo, position: Position) => {
-    return position === Position.HOME
-        ? market.homeOdds
-        : position === Position.AWAY
-        ? market.awayOdds
-        : market.drawOdds
-        ? market.drawOdds
-        : 0;
-};
-
 export const getVisibilityOfDrawOption = (tags: Array<number>, betType: BetType) => {
     const tag = tags.find((element) => TAGS_OF_MARKETS_WITHOUT_DRAW_ODDS.includes(Number(element)));
-    if (tag || betType === BetType.TOTAL || betType === BetType.SPREAD) return false;
+    if (tag || betType === BetType.TOTAL || betType === BetType.SPREAD || isPlayerProps(betType)) return false;
     return true;
 };
 
 export const hasBonus = (bonus: number | undefined) => Number(bonus) > 0;
 
 export const getFormattedBonus = (bonus: number | undefined) => `+${Math.ceil(Number(bonus))}%`;
-
-export const isMlsGame = (tag: number) => Number(tag) === MLS_TAG;
 
 export const isFifaWCGame = (tag: number) => Number(tag) === FIFA_WC_TAG || Number(tag) === FIFA_WC_U20_TAG;
 
@@ -357,66 +246,37 @@ export const isUEFAGame = (tag: number) => UEFA_TAGS.includes(tag);
 
 export const isMotosport = (tag: number) => MOTOSPORT_TAGS.includes(tag);
 
-export const isTwoPositionalSport = (tag: number) => TAGS_OF_MARKETS_WITHOUT_DRAW_ODDS.includes(tag);
+export const isGolf = (tag: number) => GOLF_TAGS.includes(tag);
 
-export const getIsIndividualCompetition = (tag: number) => PERSON_COMPETITIONS.includes(tag);
-
-export const isParlayWon = (parlayMarket: ParlayMarket) => {
-    const resolvedMarkets = parlayMarket.sportMarkets.filter((market) => market?.isResolved || market?.isCanceled);
-    const claimablePositions = parlayMarket.positions.filter((position) => position.claimable);
-
-    return (
-        (resolvedMarkets &&
-            resolvedMarkets?.length === claimablePositions?.length &&
-            resolvedMarkets?.length === parlayMarket.sportMarkets.length) ||
-        parlayMarket.won
+export const isParlayWon = (parlayMarket: ParlayMarket) =>
+    parlayMarket.positions.every(
+        (position) =>
+            convertPositionNameToPosition(position.side) ===
+                convertFinalResultToResultType(position.market.finalResult) || position.market.isCanceled
     );
-};
+
+export const isParlayLost = (parlayMarket: ParlayMarket) =>
+    parlayMarket.positions.some(
+        (position) =>
+            convertPositionNameToPosition(position.side) !==
+                convertFinalResultToResultType(position.market.finalResult) &&
+            position.market.isResolved &&
+            !position.market.isCanceled
+    );
 
 export const isParlayClaimable = (parlayMarket: ParlayMarket) => {
-    const resolvedMarkets = parlayMarket.sportMarkets.filter((market) => market?.isResolved || market?.isCanceled);
-    const claimablePositions = parlayMarket.positions.filter((position) => position.claimable);
-
-    if (parlayMarket.claimed) return false;
-
-    const lastGameStartsPlusExpirationPeriod = addDaysToEnteredTimestamp(
+    const lastGameStartsExpiryDate = addDaysToEnteredTimestamp(
         EXPIRE_SINGLE_SPORT_MARKET_PERIOD_IN_DAYS,
         parlayMarket.lastGameStarts
     );
+    const isMarketExpired = lastGameStartsExpiryDate < new Date().getTime();
 
-    if (lastGameStartsPlusExpirationPeriod < new Date().getTime()) {
-        return false;
-    }
-
-    if (
-        resolvedMarkets?.length == claimablePositions?.length &&
-        resolvedMarkets?.length == parlayMarket.sportMarkets.length &&
-        !parlayMarket.claimed
-    ) {
-        return true;
-    }
-
-    return false;
+    return isParlayWon(parlayMarket) && !isMarketExpired && !parlayMarket.claimed;
 };
 
 export const isParlayOpen = (parlayMarket: ParlayMarket) => {
-    const resolvedMarkets = parlayMarket.sportMarkets.filter((market) => market?.isResolved);
-    const resolvedAndClaimable = parlayMarket.positions.filter(
-        (position) => position.claimable && (position.market.isResolved || position.market.isCanceled)
-    );
-
-    if (resolvedMarkets?.length == 0) return true;
-
-    if (resolvedMarkets?.length !== resolvedAndClaimable?.length) return false;
-    if (resolvedMarkets?.length === parlayMarket.sportMarkets.length) return false;
-
-    return true;
-};
-
-export const isCanceledMarketInParlay = (parlayMarket: ParlayMarket) => {
-    const canceledMarket = parlayMarket.sportMarkets.filter((market) => market?.isCanceled);
-    if (canceledMarket) return true;
-    return false;
+    const parlayHasOpenMarkets = parlayMarket.positions.some((position) => position.market.isOpen);
+    return parlayHasOpenMarkets && !isParlayLost(parlayMarket);
 };
 
 export const isSportMarketExpired = (sportMarket: SportMarketInfo) => {
@@ -425,45 +285,39 @@ export const isSportMarketExpired = (sportMarket: SportMarketInfo) => {
         new Date(sportMarket.maturityDate).getTime()
     );
 
-    if (maturyDatePlusExpirationPeriod < new Date().getTime()) {
-        return true;
-    }
-
-    return false;
+    return maturyDatePlusExpirationPeriod < new Date().getTime();
 };
 
 export const updateTotalQuoteAndAmountFromContract = (
     parlayMarkets: ParlayMarket[] | ParlayMarketWithRound[]
 ): ParlayMarket[] | ParlayMarketWithRound[] => {
     const modifiedParlays = parlayMarkets.map((parlay) => {
-        if (isCanceledMarketInParlay(parlay)) {
-            const canceledQuotes = getCanceledGamesPreviousQuotes(parlay);
-            let totalQuote = parlay.totalQuote;
-            canceledQuotes.forEach((quote) => {
-                totalQuote /= quote;
-            });
-            return {
-                ...parlay,
-                totalQuote,
-                totalAmount: totalQuote ? parlay.sUSDAfterFees / totalQuote : 0,
-            };
-        } else {
-            return parlay;
-        }
+        let totalQuote = parlay.totalQuote;
+        let totalAmount = parlay.totalAmount;
+
+        let realQuote = 1;
+        parlay.marketQuotes.map((quote) => {
+            realQuote = realQuote * quote;
+        });
+
+        parlay.sportMarketsFromContract.forEach((address, index) => {
+            const market = parlay.sportMarkets.find((market) => market.address === address);
+
+            if (market && market.isCanceled) {
+                realQuote = realQuote / parlay.marketQuotes[index];
+                const maximumQuote = PARLAY_MAXIMUM_QUOTE;
+                totalQuote = realQuote < maximumQuote ? maximumQuote : realQuote;
+                totalAmount = totalAmount * parlay.marketQuotes[index];
+            }
+        });
+
+        return {
+            ...parlay,
+            totalQuote,
+            totalAmount,
+        };
     });
     return modifiedParlays;
-};
-
-export const getCanceledGamesPreviousQuotes = (parlay: ParlayMarket): number[] => {
-    const quotes: number[] = [];
-    parlay.sportMarketsFromContract.forEach((marketAddress, index) => {
-        const market = parlay.sportMarkets.find((market) => market.address == marketAddress);
-        if (market?.isCanceled && parlay.marketQuotes) {
-            quotes.push(parlay.marketQuotes[index]);
-        }
-    });
-
-    return quotes;
 };
 
 export const getBonus = (market: ParlaysMarket): number => {
@@ -488,8 +342,8 @@ export const getOddTooltipText = (position: Position, market: SportMarketInfo | 
     const team =
         position === Position.AWAY || market.doubleChanceMarketType === DoubleChanceMarketType.AWAY_TEAM_NOT_TO_LOSE
             ? market.awayTeam
-            : market.isEnetpulseRacing
-            ? fixEnetpulseRacingName(market.homeTeam)
+            : market.isOneSideMarket
+            ? fixOneSideMarketCompetitorName(market.homeTeam)
             : market.homeTeam;
     const team2 = market.awayTeam;
     const scoring =
@@ -526,8 +380,30 @@ export const getOddTooltipText = (position: Position, market: SportMarketInfo | 
                             translationKey = '';
                     }
                     break;
+                case BetType.PLAYER_PROPS_STRIKEOUTS:
+                    translationKey = 'player-props.strikeouts-over';
+                    break;
+                case BetType.PLAYER_PROPS_HOMERUNS:
+                    translationKey = 'player-props.home-runs-over';
+                    break;
+                case BetType.PLAYER_PROPS_PASSING_YARDS:
+                    translationKey = 'player-props.passing-yards-over';
+                    break;
+                case BetType.PLAYER_PROPS_RUSHING_YARDS:
+                    translationKey = 'player-props.rushing-yards-over';
+                    break;
+                case BetType.PLAYER_PROPS_RECEIVING_YARDS:
+                    translationKey = 'player-props.receiving-yards-over';
+                    break;
+                case BetType.PLAYER_PROPS_PASSING_TOUCHDOWNS:
+                    translationKey = 'player-props.passing-touchdowns-over';
+                    break;
                 default:
-                    translationKey = market.isEnetpulseRacing ? 'race-winner' : 'winner';
+                    translationKey = market.isOneSideMarket
+                        ? Number(market.tags[0]) == GOLF_TOURNAMENT_WINNER_TAG
+                            ? 'tournament-winner'
+                            : 'race-winner'
+                        : 'winner';
             }
             break;
         case Position.AWAY:
@@ -538,8 +414,30 @@ export const getOddTooltipText = (position: Position, market: SportMarketInfo | 
                 case BetType.TOTAL:
                     translationKey = 'total.under';
                     break;
+                case BetType.PLAYER_PROPS_STRIKEOUTS:
+                    translationKey = 'player-props.strikeouts-under';
+                    break;
+                case BetType.PLAYER_PROPS_HOMERUNS:
+                    translationKey = 'player-props.home-runs-under';
+                    break;
+                case BetType.PLAYER_PROPS_PASSING_YARDS:
+                    translationKey = 'player-props.passing-yards-under';
+                    break;
+                case BetType.PLAYER_PROPS_RUSHING_YARDS:
+                    translationKey = 'player-props.rushing-yards-under';
+                    break;
+                case BetType.PLAYER_PROPS_RECEIVING_YARDS:
+                    translationKey = 'player-props.receiving-yards-under';
+                    break;
+                case BetType.PLAYER_PROPS_PASSING_TOUCHDOWNS:
+                    translationKey = 'player-props.passing-touchdowns-under';
+                    break;
                 default:
-                    translationKey = market.isEnetpulseRacing ? 'race-winner' : 'winner';
+                    translationKey = market.isOneSideMarket
+                        ? Number(market.tags[0]) == GOLF_TOURNAMENT_WINNER_TAG
+                            ? 'tournament-winner'
+                            : 'race-winner'
+                        : 'winner';
             }
             break;
         case Position.DRAW:
@@ -547,11 +445,11 @@ export const getOddTooltipText = (position: Position, market: SportMarketInfo | 
             break;
     }
     return i18n.t(`markets.market-card.odd-tooltip.${translationKey}`, {
-        team,
+        team: market.playerName === null ? team : market.playerName,
         team2,
         spread,
         total,
-        scoring,
+        scoring: market.playerName === null ? scoring : market.playerPropsLine,
         matchResolve,
     });
 };
@@ -573,14 +471,22 @@ export const getCombinedOddTooltipText = (markets: SportMarketInfo[], positions:
         let translationKey = '';
         switch (positions[0]) {
             case Position.HOME:
-                translationKey = markets[0].isEnetpulseRacing ? 'race-winner' : 'winner';
+                translationKey = markets[0].isOneSideMarket
+                    ? Number(markets[0].tags[0]) == GOLF_TOURNAMENT_WINNER_TAG
+                        ? 'tournament-winner'
+                        : 'race-winner'
+                    : 'winner';
                 team = markets[0].homeTeam;
                 break;
             case Position.DRAW:
                 translationKey = 'draw';
                 break;
             case Position.AWAY:
-                translationKey = markets[0].isEnetpulseRacing ? 'race-winner' : 'winner';
+                translationKey = markets[0].isOneSideMarket
+                    ? Number(markets[0].tags[0]) == GOLF_TOURNAMENT_WINNER_TAG
+                        ? 'tournament-winner'
+                        : 'race-winner'
+                    : 'winner';
                 team = markets[0].awayTeam;
                 break;
         }
@@ -644,34 +550,40 @@ export const getCombinedOddTooltipText = (markets: SportMarketInfo[], positions:
 export const convertPriceImpactToBonus = (priceImpact: number): number => -((priceImpact / (1 + priceImpact)) * 100);
 
 export const syncPositionsAndMarketsPerContractOrderInParlay = (parlayMarket: ParlayMarket): ParlayMarketWithQuotes => {
-    const _parlayMarket: ParlayMarketWithQuotes = { ...parlayMarket, quotes: [] };
+    const syncedParlayMarket: ParlayMarketWithQuotes = { ...parlayMarket, quotes: [] };
 
-    const _positions: PositionData[] = [];
-    const _markets: SportMarketInfo[] = [];
-    const _quotes: number[] = [];
+    const positions: PositionData[] = [];
+    const markets: SportMarketInfo[] = [];
+    const quotes: number[] = [];
 
     parlayMarket.sportMarketsFromContract.forEach((address, index) => {
-        const _position = parlayMarket.positions.find((position) => position.market.address == address);
-        const _market = parlayMarket.sportMarkets.find((market) => market.address == address);
+        const position = parlayMarket.positions.find((position) => position.market.address == address);
+        const market = parlayMarket.sportMarkets.find((market) => market.address == address);
 
-        _position ? _positions.push(_position) : '';
-        _market ? _markets.push(_market) : '';
+        if (position && market) {
+            position.market = market;
+            position.market.isOneSideMarket = getIsOneSideMarket(Number(market.tags[0]));
 
-        const _quote = _market?.isCanceled ? 1 : parlayMarket.marketQuotes ? parlayMarket.marketQuotes[index] : 0;
-        _quotes.push(_quote);
+            positions.push(position);
+            markets.push(market);
+
+            const quote = market.isCanceled ? 1 : parlayMarket.marketQuotes[index];
+            quotes.push(quote);
+        }
     });
 
-    _parlayMarket.sportMarkets = _markets;
-    _parlayMarket.positions = _positions;
-    _parlayMarket.quotes = _quotes;
+    syncedParlayMarket.sportMarkets = markets;
+    syncedParlayMarket.positions = positions;
+    syncedParlayMarket.quotes = quotes;
 
-    return _parlayMarket;
+    return syncedParlayMarket;
 };
 
 export const isParentMarketSameForSportMarkets = (
     firstMarket: SportMarketInfo,
     secondMarket: SportMarketInfo
 ): boolean => {
+    if (isPlayerProps(firstMarket.betType) || isPlayerProps(secondMarket.betType)) return false;
     if (firstMarket.parentMarket && secondMarket.parentMarket) {
         return firstMarket.parentMarket == secondMarket.parentMarket;
     }
@@ -689,4 +601,27 @@ export const isParentMarketSameForSportMarkets = (
 
 export const getMarketAddressesFromSportMarketArray = (markets: SportMarketInfo[]): string[] => {
     return markets.map((market) => market.address);
+};
+
+export const getIsOneSideMarket = (tag: number) =>
+    SPORTS_TAGS_MAP['Motosport'].includes(Number(tag)) || Number(tag) == GOLF_TOURNAMENT_WINNER_TAG;
+
+export const canPlayerBeAddedToParlay = (parlayPositions: ParlaysMarketPosition[], position: ParlaysMarketPosition) => {
+    let canBeAdded = true;
+    parlayPositions.map((parlayPosition) => {
+        if (parlayPosition.parentMarket === position.parentMarket) {
+            if (parlayPosition.playerId === null) {
+                canBeAdded = false;
+            }
+
+            if (parlayPosition.sportMarketAddress === position.sportMarketAddress) {
+                canBeAdded = false;
+            }
+        }
+    });
+    return canBeAdded;
+};
+
+export const isPlayerProps = (betType: BetType) => {
+    return PLAYER_PROPS_BET_TYPES.includes(betType);
 };

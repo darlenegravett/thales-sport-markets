@@ -9,8 +9,10 @@ import { formatCurrency } from 'utils/formatters/number';
 import { useSelector } from 'react-redux';
 import { RootState } from 'redux/rootReducer';
 import { getIsMobile } from 'redux/modules/app';
-import { getOddTooltipText, getSpreadTotalText, getSymbolText } from 'utils/markets';
+import { getMarketName, getOddTooltipText, getSpreadTotalText, getSymbolText, isPlayerProps } from 'utils/markets';
 import PositionSymbol from 'components/PositionSymbol';
+import { useTheme } from 'styled-components';
+import { ThemeInterface } from 'types/ui';
 
 type TransactionsTableProps = {
     transactions: MarketTransactions;
@@ -18,8 +20,9 @@ type TransactionsTableProps = {
     isLoading: boolean;
 };
 
-export const TransactionsTable: FC<TransactionsTableProps> = memo(({ transactions, noResultsMessage, isLoading }) => {
+const TransactionsTable: FC<TransactionsTableProps> = memo(({ transactions, noResultsMessage, isLoading }) => {
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     return (
         <>
@@ -32,7 +35,7 @@ export const TransactionsTable: FC<TransactionsTableProps> = memo(({ transaction
                         Cell: (cellProps: CellProps<MarketTransaction, MarketTransaction['timestamp']>) => (
                             <p>{formatTxTimestamp(cellProps.cell.value)}</p>
                         ),
-                        width: 150,
+                        width: '150px',
                         sortable: true,
                     },
                     {
@@ -41,7 +44,7 @@ export const TransactionsTable: FC<TransactionsTableProps> = memo(({ transaction
                         Cell: (cellProps: CellProps<MarketTransaction, MarketTransaction['type']>) => (
                             <p>{t(`market.table.type.${cellProps.cell.value}`).toUpperCase()}</p>
                         ),
-                        width: 150,
+                        width: '80px',
                         sortable: true,
                     },
                     {
@@ -52,18 +55,25 @@ export const TransactionsTable: FC<TransactionsTableProps> = memo(({ transaction
                                 cellProps.cell.value,
                                 cellProps.cell.row.original.wholeMarket
                             );
-                            const isEnetpulseRacingMarket = cellProps.cell.row.original.wholeMarket.isEnetpulseRacing;
+                            const isOneSideMarket = cellProps.cell.row.original.wholeMarket.isOneSideMarket;
                             const spreadTotalText = getSpreadTotalText(
                                 cellProps.cell.row.original.wholeMarket,
                                 cellProps.cell.value
                             );
+                            const additionalText = isPlayerProps(cellProps.cell.row.original.wholeMarket.betType)
+                                ? getMarketName(cellProps.cell.row.original.wholeMarket, cellProps.cell.value)
+                                : '';
                             return symbolText ? (
                                 <PositionSymbol
                                     symbolText={symbolText}
+                                    symbolAdditionalText={{
+                                        text: additionalText,
+                                        textStyle: { marginLeft: 24, whiteSpace: 'pre-wrap' },
+                                    }}
                                     additionalStyle={{
                                         width: 23,
                                         height: 23,
-                                        fontSize: isEnetpulseRacingMarket ? 8.5 : 10.5,
+                                        fontSize: isOneSideMarket ? 8.5 : 10.5,
                                         borderWidth: 2,
                                     }}
                                     symbolUpperText={
@@ -71,7 +81,7 @@ export const TransactionsTable: FC<TransactionsTableProps> = memo(({ transaction
                                             ? {
                                                   text: spreadTotalText,
                                                   textStyle: {
-                                                      backgroundColor: '#1A1C2B',
+                                                      backgroundColor: theme.background.primary,
                                                       fontSize: '10px',
                                                       top: '-8px',
                                                       left: '13px',
@@ -93,7 +103,8 @@ export const TransactionsTable: FC<TransactionsTableProps> = memo(({ transaction
                                 <p>N/A</p>
                             );
                         },
-                        width: 150,
+                        minWidth: 200,
+                        width: '200px',
                         sortable: true,
                     },
                     {
@@ -103,7 +114,7 @@ export const TransactionsTable: FC<TransactionsTableProps> = memo(({ transaction
                         Cell: (cellProps: CellProps<MarketTransaction, MarketTransaction['paid']>) => (
                             <p>{cellProps.cell.value ? `$ ${formatCurrency(cellProps.cell.value)}` : 'N/A'}</p>
                         ),
-                        width: 150,
+                        width: '100px',
                         sortable: true,
                     },
                     {
@@ -113,7 +124,7 @@ export const TransactionsTable: FC<TransactionsTableProps> = memo(({ transaction
                         Cell: (cellProps: CellProps<MarketTransaction, MarketTransaction['amount']>) => (
                             <p>{formatCurrency(cellProps.cell.value)}</p>
                         ),
-                        width: 150,
+                        width: '100px',
                         sortable: true,
                     },
                     {
@@ -122,13 +133,16 @@ export const TransactionsTable: FC<TransactionsTableProps> = memo(({ transaction
                         Cell: (cellProps: CellProps<MarketTransaction, MarketTransaction['hash']>) => (
                             <ViewEtherscanLink hash={cellProps.cell.value} />
                         ),
-                        width: 150,
+                        width: '100px',
                     },
                 ]}
                 data={transactions}
                 isLoading={isLoading}
                 noResultsMessage={noResultsMessage}
-                tableHeadCellStyles={isMobile ? TableHeaderStyleMobile : TableHeaderStyle}
+                tableHeadCellStyles={{
+                    ...(isMobile ? TableHeaderStyleMobile : TableHeaderStyle),
+                    color: theme.textColor.secondary,
+                }}
                 tableRowStyles={{ fontSize: '12px' }}
             />
         </>
@@ -142,7 +156,6 @@ const TableHeaderStyle: React.CSSProperties = {
     fontSize: '12px',
     lineHeight: '12px',
     textTransform: 'uppercase',
-    color: '#5F6180',
     justifyContent: 'flex-start',
 };
 
@@ -153,7 +166,6 @@ const TableHeaderStyleMobile: React.CSSProperties = {
     fontSize: '10px',
     lineHeight: '12px',
     textTransform: 'uppercase',
-    color: '#5F6180',
     justifyContent: 'center',
 };
 

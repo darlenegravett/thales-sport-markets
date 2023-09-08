@@ -1,4 +1,3 @@
-import { MAIN_COLORS } from 'constants/ui';
 import styled from 'styled-components';
 import { FlexDivColumn, FlexDivRow, FlexDivRowCentered } from 'styles/common';
 
@@ -10,7 +9,8 @@ export const Wrapper = styled(FlexDivColumn)<{
     display: ${(props) => (props.hideGame ? 'none' : '')};
     border-radius: 5px;
     margin-bottom: 8px;
-    background-color: ${(props) => (props.isResolved ? 'rgb(36,41,64, 0.5)' : MAIN_COLORS.LIGHT_GRAY)};
+    background-color: ${(props) =>
+        props.isResolved ? props.theme.oddsContainerBackground.tertiary : props.theme.oddsContainerBackground.primary};
     @media (max-width: 575px) {
         margin-bottom: 5px;
     }
@@ -25,7 +25,8 @@ export const MainContainer = styled(FlexDivRow)`
 `;
 
 export const SecondRowContainer = styled(MainContainer)<{ mobilePaddingRight: number }>`
-    background-color: ${MAIN_COLORS.GRAY};
+    position: relative;
+    background-color: ${(props) => props.theme.oddsContainerBackground.secondary};
     flex-wrap: wrap;
     justify-content: flex-start;
     border-radius: 0 0 5px 5px;
@@ -103,12 +104,38 @@ export const ResultLabel = styled.span`
     text-transform: uppercase;
 `;
 
+export const TotalMarketsWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+`;
+
 export const TotalMarketsContainer = styled.span`
     display: inline-flex;
     justify-content: center;
     align-items: center;
     width: 117px;
     padding-left: 9px;
+`;
+
+export const PlayerPropsLabel = styled.span`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    height: 20px;
+    border-radius: 30px;
+    border: 1px solid ${(props) => props.theme.background.quaternary};
+    box-shadow: 0px 0px 6.39919px 0px ${(props) => props.theme.background.quaternary};
+    color: ${(props) => props.theme.background.quaternary};
+    font-family: Roboto;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    text-transform: uppercase;
 `;
 
 export const TotalMarketsLabel = styled.span`
@@ -131,7 +158,7 @@ export const TotalMarkets = styled.span`
     text-align: center;
     align-items: center;
     justify-content: center;
-    background: #5f6180;
+    background: ${(props) => props.theme.background.tertiary};
     border-radius: 50%;
     margin-right: 6px;
 `;
@@ -149,6 +176,46 @@ export const Arrow = styled.i`
     cursor: pointer;
 `;
 
+export const ArrowRight = styled.i`
+    font-size: 11px;
+    color: ${(props) => props.theme.textColor.quaternary};
+`;
+
 export const OddsWrapper = styled(FlexDivRow)`
     position: relative;
+`;
+
+export const PlayerPropsText = styled.span`
+    color: ${(props) => props.theme.textColor.quaternary};
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    text-transform: uppercase;
+`;
+
+export const PlayerPropsContainer = styled.div`
+    display: flex;
+    justify-content: flex-start;
+    gap: 4px;
+    align-items: center;
+    margin-left: 10px;
+    margin-top: 6px;
+`;
+
+export const PlayerPropsBubble = styled.span`
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    padding: 2px;
+    background: ${(props) => props.theme.textColor.quaternary};
+    color: ${(props) => props.theme.background.primary};
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    text-transform: uppercase;
 `;

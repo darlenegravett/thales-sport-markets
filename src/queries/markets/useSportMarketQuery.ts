@@ -2,17 +2,16 @@ import { useQuery, UseQueryOptions } from 'react-query';
 import QUERY_KEYS from 'constants/queryKeys';
 import { CombinedMarketsContractData, SportMarketInfo } from 'types/markets';
 import thalesData from 'thales-data';
-import { NetworkId } from 'types/network';
+import { Network } from 'enums/network';
 import networkConnector from 'utils/networkConnector';
 import { insertCombinedMarketsIntoArrayOFMarkets } from 'utils/combinedMarkets';
-import { getMarketAddressesFromSportMarketArray } from 'utils/markets';
-import { getDefaultDecimalsForNetwork } from 'utils/collaterals';
+import { getIsOneSideMarket, getMarketAddressesFromSportMarketArray } from 'utils/markets';
+import { getDefaultDecimalsForNetwork } from 'utils/network';
 import { bigNumberFormmaterWithDecimals } from 'utils/formatters/ethers';
-import { ENETPULSE_SPORTS, SPORTS_TAGS_MAP } from 'constants/tags';
 
 const useSportMarketQuery = (
     marketAddress: string,
-    networkId: NetworkId,
+    networkId: Network,
     options?: UseQueryOptions<SportMarketInfo | undefined>
 ) => {
     return useQuery<SportMarketInfo | undefined>(
@@ -35,10 +34,7 @@ const useSportMarketQuery = (
 
                 if (parentMarketFromGraph) {
                     const parentMarket = parentMarketFromGraph[0];
-                    parentMarket.isEnetpulseRacing =
-                        SPORTS_TAGS_MAP['Motosport'].includes(Number(parentMarket.tags[0])) &&
-                        ENETPULSE_SPORTS.includes(Number(parentMarket.tags[0]));
-
+                    parentMarket.isOneSideMarket = getIsOneSideMarket(Number(parentMarket.tags[0]));
                     parentMarket.childMarkets = childMarkets;
                     const marketAddresses = getMarketAddressesFromSportMarketArray([parentMarket]);
                     parentMarket.homeOdds = parentMarketData.odds[0]

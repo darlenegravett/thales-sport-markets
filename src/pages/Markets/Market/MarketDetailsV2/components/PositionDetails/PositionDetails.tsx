@@ -1,7 +1,6 @@
 import Tooltip from 'components/Tooltip';
 import { oddToastOptions } from 'config/toast';
 import { MIN_LIQUIDITY } from 'constants/markets';
-import { Position } from 'constants/options';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
@@ -35,6 +34,7 @@ import {
     TooltipFooterInfoLabel,
     TooltipBonusText,
 } from './styled-components';
+import { Position } from 'enums/markets';
 
 type PositionDetailsProps = {
     market: SportMarketInfo;
@@ -58,14 +58,16 @@ const PositionDetails: React.FC<PositionDetailsProps> = ({ market, odd, availabl
         addedToParlay.doubleChanceMarketType === market.doubleChanceMarketType &&
         !isMarketPartOfCombinedMarket;
 
-    const isGameCancelled = market.isCanceled || (market.isOpen && market.isResolved);
+    const isGameStarted = market.maturityDate < new Date();
+    const isGameCancelled = market.isCanceled || (!isGameStarted && market.isResolved);
     const isGameResolved = market.isResolved || market.isCanceled;
     const isGameRegularlyResolved = market.isResolved && !market.isCanceled;
-    const isPendingResolution = !market.isOpen && !isGameResolved;
+    const isPendingResolution = isGameStarted && !isGameResolved;
     const isGamePaused = market.isPaused && !isGameResolved;
-    const isGameOpen = !market.isResolved && !market.isCanceled && !market.isPaused && market.isOpen;
+    const isGameOpen = !market.isResolved && !market.isCanceled && !market.isPaused && !isGameStarted;
 
-    const noLiquidity = !!availablePerPosition.available && availablePerPosition.available < MIN_LIQUIDITY;
+    const noLiquidity =
+        availablePerPosition.available !== undefined && availablePerPosition.available < MIN_LIQUIDITY && isGameOpen;
     const noOdd = !odd || odd == 0;
     const disabledPosition = noOdd || noLiquidity || !isGameOpen;
 
@@ -104,8 +106,11 @@ const PositionDetails: React.FC<PositionDetailsProps> = ({ market, odd, availabl
                         awayTeam: market.awayTeam || '',
                         tags: market.tags,
                         doubleChanceMarketType: market.doubleChanceMarketType,
-                        isRacingMarket: market.isEnetpulseRacing,
+                        isOneSideMarket: market.isOneSideMarket,
                         tag: market.tags[0],
+                        playerName: market.playerName ?? undefined,
+                        playerId: market.playerId ?? undefined,
+                        playerPropsType: market.playerPropsType ?? undefined,
                     };
                     dispatch(updateParlay(parlayMarket));
                     if (isMobile) {

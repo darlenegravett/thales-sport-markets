@@ -16,12 +16,11 @@ import { getReferralId, setReferralId } from 'utils/referral';
 import { useLocation } from 'react-router-dom';
 import i18n from 'i18n';
 import { setTheme } from 'redux/modules/ui';
-import { Theme } from 'constants/ui';
-import ROUTES from 'constants/routes';
 import { generalConfig } from 'config/general';
 import axios from 'axios';
 import useWidgetBotScript from 'hooks/useWidgetBotScript';
 import { isAndroid, isMetamask, isMobile } from 'utils/device';
+import { Theme } from 'enums/ui';
 
 const DappLayout: React.FC = ({ children }) => {
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
@@ -89,11 +88,8 @@ const DappLayout: React.FC = ({ children }) => {
     }, [networkId, i18n.language, walletAddress]);
 
     useEffect(() => {
-        if (![ROUTES.MintWorldCupNFT, ROUTES.MarchMadness].includes(location.pathname)) {
-            dispatch(setTheme(Theme.DARK));
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [location.pathname]);
+        dispatch(setTheme(Theme.DARK));
+    }, [dispatch]);
 
     useEffect(() => {
         const checkMetamaskBrowser = async () => {
@@ -137,15 +133,15 @@ const Wrapper = styled(FlexDivColumn)`
     width: 99%;
     margin-left: auto;
     margin-right: auto;
-    padding: 40px 0px;
+    padding: 20px 0px;
     max-width: 1350px;
     min-height: 100vh;
     justify-content: space-between;
     @media (max-width: 1260px) {
-        padding: 40px 20px;
+        padding: 0px 20px;
     }
     @media (max-width: 767px) {
-        padding: 40px 10px;
+        padding: 0px 10px;
     }
 `;
 

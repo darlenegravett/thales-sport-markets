@@ -33,11 +33,7 @@ export type UserLiquidityPoolData = {
     withdrawalAmount: number;
 };
 
-export type UserLiquidityPoolsData = {
-    balanceTotal: number;
-};
-
-export type LiquidityPoolPnlPerRound = {
+type LiquidityPoolPnlPerRound = {
     round: number | string;
     pnlPerRound: number;
     cumulativePnl: number;
@@ -49,6 +45,7 @@ export type LiquidityPoolUserTransaction = {
     hash: string;
     timestamp: number;
     blockNumber: number;
+    liquidityPoolType: string;
     type: string;
     account: string;
     amount: number;
@@ -75,3 +72,5 @@ export type LiquidityPoolReturn = {
     apr: number;
     apy: number;
 };
+
+export type LiquidityPoolType = 'single' | 'parlay';

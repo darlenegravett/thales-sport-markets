@@ -3,8 +3,16 @@ import React, { useEffect, useMemo, useState } from 'react';
 import PositionSymbol from 'components/PositionSymbol';
 import { getErrorToastOptions, getSuccessToastOptions } from 'config/toast';
 import { USD_SIGN } from 'constants/currency';
-import { ENETPULSE_SPORTS, FIFA_WC_TAG, FIFA_WC_U20_TAG, SPORTS_TAGS_MAP, SPORT_PERIODS_MAP } from 'constants/tags';
-import { GAME_STATUS, STATUS_COLOR } from 'constants/ui';
+import {
+    BetTypeNameMap,
+    ENETPULSE_SPORTS,
+    FIFA_WC_TAG,
+    FIFA_WC_U20_TAG,
+    JSON_ODDS_SPORTS,
+    SPORTS_TAGS_MAP,
+    SPORT_PERIODS_MAP,
+} from 'constants/tags';
+import { GAME_STATUS } from 'constants/ui';
 import { ethers } from 'ethers';
 import i18n from 'i18n';
 import { ShareTicketModalProps } from 'pages/Markets/Home/Parlay/components/ShareTicketModal/ShareTicketModal';
@@ -39,7 +47,6 @@ import { refetchAfterClaim } from 'utils/queryConnector';
 import { buildMarketLink } from 'utils/routes';
 import { getOrdinalNumberLabel } from 'utils/ui';
 import {
-    ClaimButton,
     ClaimContainer,
     ClaimLabel,
     ClaimValue,
@@ -59,6 +66,7 @@ import {
     ColumnDirectionInfo,
     MatchPeriodContainer,
     MatchPeriodLabel,
+    PlayerIcon,
     PositionContainer,
     ResultContainer,
     ScoreContainer,
@@ -66,7 +74,11 @@ import {
     TeamScoreLabel,
     Wrapper,
 } from './styled-components';
-import { fixEnetpulseRacingName } from 'utils/formatters/string';
+import { fixOneSideMarketCompetitorName } from 'utils/formatters/string';
+import { ThemeInterface } from 'types/ui';
+import { useTheme } from 'styled-components';
+import Button from 'components/Button';
+import { BetType } from 'enums/markets';
 
 type SinglePositionProps = {
     position: AccountPositionProfile;
@@ -81,6 +93,7 @@ const SinglePosition: React.FC<SinglePositionProps> = ({
 }) => {
     const language = i18n.language;
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const networkId = useSelector((state: RootState) => getNetworkId(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
@@ -126,13 +139,13 @@ const SinglePosition: React.FC<SinglePositionProps> = ({
     const isGameResolved = position.market.isResolved || position.market.isCanceled;
     const isPendingResolution = isGameStarted && !isGameResolved;
     const isEnetpulseSport = ENETPULSE_SPORTS.includes(Number(position.market.tags[0]));
-    // const gameIdString = Web3.utils.hexToAscii(position.market.id);
+    const isJsonOddsSport = JSON_ODDS_SPORTS.includes(Number(position.market.tags[0]));
 
     const gameDate = new Date(position.market.maturityDate).toISOString().split('T')[0];
     const [liveResultInfo, setLiveResultInfo] = useState<SportMarketLiveResult | undefined>(undefined);
 
     const useLiveResultQuery = useSportMarketLiveResultQuery(position.market.id, {
-        enabled: isAppReady && isPendingResolution && !isEnetpulseSport && !isMobile,
+        enabled: isAppReady && isPendingResolution && !isEnetpulseSport && !isMobile && !isJsonOddsSport,
     });
 
     const useEnetpulseLiveResultQuery = useEnetpulseAdditionalDataQuery(
@@ -219,19 +232,27 @@ const SinglePosition: React.FC<SinglePositionProps> = ({
 
     const symbolText = getSymbolText(positionEnum, position.market);
     const spreadTotalText = getSpreadTotalText(position.market, positionEnum);
+
     return (
         <Wrapper>
             <MatchInfo>
                 <MatchLogo>
-                    <ClubLogo
-                        alt={position.market.homeTeam}
-                        src={homeLogoSrc}
-                        isFlag={position.market.tags[0] == FIFA_WC_TAG || position.market.tags[0] == FIFA_WC_U20_TAG}
-                        losingTeam={false}
-                        onError={getOnImageError(setHomeLogoSrc, position.market.tags[0])}
-                        customMobileSize={'30px'}
-                    />
-                    {!position.market.isEnetpulseRacing && (
+                    {position.market.playerName === null ? (
+                        <ClubLogo
+                            alt={position.market.homeTeam}
+                            src={homeLogoSrc}
+                            isFlag={
+                                position.market.tags[0] == FIFA_WC_TAG || position.market.tags[0] == FIFA_WC_U20_TAG
+                            }
+                            losingTeam={false}
+                            onError={getOnImageError(setHomeLogoSrc, position.market.tags[0])}
+                            customMobileSize={'30px'}
+                        />
+                    ) : (
+                        <PlayerIcon className="icon icon--profile" />
+                    )}
+
+                    {!position.market.isOneSideMarket && position.market.playerName === null && (
                         <ClubLogo
                             awayTeam={true}
                             alt={position.market.awayTeam}
@@ -247,17 +268,21 @@ const SinglePosition: React.FC<SinglePositionProps> = ({
                 </MatchLogo>
                 <MatchLabel>
                     <ClubName>
-                        {position.market.isEnetpulseRacing
-                            ? fixEnetpulseRacingName(position.market.homeTeam)
-                            : position.market.homeTeam}
+                        {position.market.playerName === null
+                            ? position.market.isOneSideMarket
+                                ? fixOneSideMarketCompetitorName(position.market.homeTeam)
+                                : position.market.homeTeam
+                            : `${position.market.playerName} (${BetTypeNameMap[position.market.betType as BetType]})`}
                     </ClubName>
-                    {!position.market.isEnetpulseRacing && <ClubName>{position.market.awayTeam}</ClubName>}
+                    {!position.market.isOneSideMarket && position.market.playerName === null && (
+                        <ClubName>{position.market.awayTeam}</ClubName>
+                    )}
                 </MatchLabel>
             </MatchInfo>
             <StatusContainer>
                 {isPendingResolution && !isMobile ? (
-                    isEnetpulseSport ? (
-                        <Status color={STATUS_COLOR.STARTED}>{t('markets.market-card.pending')}</Status>
+                    isEnetpulseSport || isJsonOddsSport ? (
+                        <Status color={theme.status.started}>{t('markets.market-card.pending')}</Status>
                     ) : (
                         <FlexDivRow>
                             {liveResultInfo?.status != GAME_STATUS.FINAL &&
@@ -322,7 +347,7 @@ const SinglePosition: React.FC<SinglePositionProps> = ({
                                 : undefined
                         }
                         tooltip={<>{getOddTooltipText(positionEnum, position.market)}</>}
-                        additionalStyle={position.market.isEnetpulseRacing ? { fontSize: 11 } : {}}
+                        additionalStyle={position.market.isOneSideMarket ? { fontSize: 11 } : {}}
                     />
                 </PositionContainer>
                 {isClaimable && (
@@ -334,22 +359,30 @@ const SinglePosition: React.FC<SinglePositionProps> = ({
                         ) : (
                             <ColumnDirectionInfo>
                                 <Label>{t('profile.card.result')}:</Label>
-                                <BoldValue>{`${position.market.homeScore} : ${position.market.awayScore}`}</BoldValue>
+                                <BoldValue>
+                                    {position.market.playerName !== null
+                                        ? position.market.playerPropsScore
+                                        : `${position.market.homeScore} : ${position.market.awayScore}`}
+                                </BoldValue>
                             </ColumnDirectionInfo>
                         )}
                         {isMobile ? (
                             <ClaimContainer>
                                 <ClaimValue>{formatCurrencyWithSign(USD_SIGN, claimAmount, 2)}</ClaimValue>
-                                <ClaimButton
-                                    claimable={true}
+                                <Button
                                     onClick={(e: any) => {
                                         e.preventDefault();
                                         e.stopPropagation();
                                         claimReward();
                                     }}
+                                    backgroundColor={theme.button.background.quaternary}
+                                    borderColor={theme.button.borderColor.secondary}
+                                    padding="2px 5px"
+                                    fontSize="9px"
+                                    height="19px"
                                 >
                                     {t('profile.card.claim')}
-                                </ClaimButton>
+                                </Button>
                             </ClaimContainer>
                         ) : (
                             <>
@@ -357,16 +390,18 @@ const SinglePosition: React.FC<SinglePositionProps> = ({
                                     <ClaimLabel>{t('profile.card.to-claim')}:</ClaimLabel>
                                     <ClaimValue>{formatCurrencyWithSign(USD_SIGN, claimAmount, 2)}</ClaimValue>
                                 </ColumnDirectionInfo>
-                                <ClaimButton
-                                    claimable={true}
+                                <Button
                                     onClick={(e: any) => {
                                         e.preventDefault();
                                         e.stopPropagation();
                                         claimReward();
                                     }}
+                                    backgroundColor={theme.button.background.quaternary}
+                                    borderColor={theme.button.borderColor.secondary}
+                                    padding="3px 15px"
                                 >
                                     {t('profile.card.claim')}
-                                </ClaimButton>
+                                </Button>
                             </>
                         )}
                     </>

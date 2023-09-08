@@ -1,14 +1,13 @@
 import QUERY_KEYS from 'constants/queryKeys';
-import { ENETPULSE_SPORTS, SPORTS_TAGS_MAP } from 'constants/tags';
 import { useQuery, UseQueryOptions } from 'react-query';
 import thalesData from 'thales-data';
 import { ParlayMarket } from 'types/markets';
-import { NetworkId } from 'types/network';
-import { updateTotalQuoteAndAmountFromContract } from 'utils/markets';
+import { Network } from 'enums/network';
+import { getIsOneSideMarket, updateTotalQuoteAndAmountFromContract } from 'utils/markets';
 
 export const useParlayMarketsQuery = (
     account: string,
-    networkId: NetworkId,
+    networkId: Network,
     minTimestamp?: number,
     maxTimestamp?: number,
     options?: UseQueryOptions<ParlayMarket[] | undefined>
@@ -29,14 +28,9 @@ export const useParlayMarketsQuery = (
                     return {
                         ...parlayMarket,
                         sportMarkets: parlayMarket.sportMarkets.map((market) => {
-                            const isEnetpulseRacing =
-                                SPORTS_TAGS_MAP['Motosport'].includes(Number(market.tags[0])) &&
-                                ENETPULSE_SPORTS.includes(Number(market.tags[0]));
                             return {
                                 ...market,
-                                homeTeam: market.homeTeam,
-                                awayTeam: market.awayTeam,
-                                isEnetpulseRacing: isEnetpulseRacing,
+                                isOneSideMarket: getIsOneSideMarket(Number(market.tags[0])),
                             };
                         }),
                     };

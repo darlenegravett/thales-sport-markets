@@ -1,3 +1,4 @@
+import { BetType } from 'enums/markets';
 import { Tags, SportsMap, SportsTagsMap } from 'types/markets';
 
 export const TAGS_LIST: Tags = [
@@ -276,7 +277,7 @@ export const TAGS_LIST: Tags = [
         logoClass: 'icon-league league--fifa-world-cup-u20',
         favourite: false,
         hidden: false,
-        priority: 112,
+        priority: 121,
     },
     {
         id: 9021,
@@ -293,6 +294,102 @@ export const TAGS_LIST: Tags = [
         favourite: false,
         hidden: false,
         priority: 113,
+    },
+    {
+        id: 109021,
+        label: 'Golf head-to-head',
+        logoClass: 'icon-league league--pga',
+        favourite: false,
+        hidden: false,
+        priority: 1001,
+    },
+    {
+        id: 109121,
+        label: 'Golf Tournament Winner',
+        logoClass: 'icon-league league--pga',
+        favourite: false,
+        hidden: false,
+        priority: 1002,
+    },
+    {
+        id: 18806,
+        label: 'UEFA Nations League',
+        logoClass: 'icon-league league--uefa-nations',
+        favourite: false,
+        hidden: false,
+        priority: 114,
+    },
+    {
+        id: 18821,
+        label: 'CONCACAF Nations League',
+        logoClass: 'icon-league league--concacaf-nations',
+        favourite: false,
+        hidden: false,
+        priority: 115,
+    },
+    {
+        id: 9288,
+        label: 'UEFA EURO U21',
+        logoClass: '',
+        favourite: false,
+        hidden: false,
+        priority: 120,
+    },
+    {
+        id: 9042,
+        label: 'UEFA Champions League Qualification',
+        logoClass: 'icon-league league--ucl',
+        favourite: false,
+        hidden: false,
+        priority: 111,
+    },
+    {
+        id: 19216,
+        label: 'UEFA Conference League qualification',
+        logoClass: '',
+        favourite: false,
+        hidden: false,
+        priority: 118,
+    },
+    {
+        id: 9076,
+        label: 'FIFA World Cup Women',
+        logoClass: '',
+        favourite: false,
+        hidden: false,
+        priority: 119,
+    },
+    {
+        id: 9073,
+        label: 'UEFA Europa League Qualification',
+        logoClass: 'icon-league league--uel',
+        favourite: false,
+        hidden: false,
+        priority: 117,
+    },
+    {
+        id: 9409,
+        label: 'FIBA World Cup',
+        logoClass: '',
+        favourite: false,
+        hidden: false,
+        priority: 303,
+    },
+    {
+        id: 9536,
+        label: 'Saudi Professional League',
+        logoClass: '',
+        favourite: false,
+        hidden: false,
+        priority: 109,
+    },
+    {
+        id: 9268,
+        label: 'Serie A',
+        logoClass: '',
+        favourite: false,
+        hidden: false,
+        priority: 109,
     },
 ];
 
@@ -332,6 +429,18 @@ export const SPORTS_MAP: SportsMap = {
     9296: 'Soccer',
     9021: 'Cricket',
     9050: 'Soccer',
+    109021: 'Golf',
+    109121: 'Golf',
+    18806: 'Soccer',
+    18821: 'Soccer',
+    9288: 'Soccer',
+    9042: 'Soccer',
+    19216: 'Soccer',
+    9076: 'Soccer',
+    9073: 'Soccer',
+    9409: 'Basketball',
+    9536: 'Soccer',
+    9268: 'Soccer',
 };
 
 export const TAGS_OF_MARKETS_WITHOUT_DRAW_ODDS = [
@@ -354,55 +463,49 @@ export const TAGS_OF_MARKETS_WITHOUT_DRAW_ODDS = [
     9399,
     18196,
     9021,
+    109021,
+    109121,
+    9409,
 ];
 
 export const SPORTS_TAGS_MAP: SportsTagsMap = {
     Football: [9001, 9002],
     Baseball: [9003],
-    Basketball: [9004, 9005, 9008, 9399],
+    Basketball: [9004, 9005, 9008, 9399, 9409],
     Hockey: [9006, 9033],
-    Soccer: [9010, 9011, 9012, 9013, 9014, 9015, 9016, 9017, 9018, 9019, 9057, 9061, 9045, 9296, 9050],
+    Soccer: [
+        9010,
+        9011,
+        9012,
+        9013,
+        9014,
+        9015,
+        9016,
+        9017,
+        9018,
+        9019,
+        9057,
+        9061,
+        9045,
+        9296,
+        9050,
+        18806,
+        18821,
+        9288,
+        9042,
+        19216,
+        9076,
+        9073,
+        9536,
+        9268,
+    ],
     MMA: [9007, 18196],
     Motosport: [9445, 9497],
     Tennis: [9153, 9156],
     eSports: [18977, 18983, 19138],
     Cricket: [9020, 9021],
+    Golf: [109021, 109121],
 };
-
-export enum TAGS_FLAGS {
-    NCAA_FOOTBALL = 9001,
-    NFL = 9002,
-    MLB = 9003,
-    NBA = 9004,
-    NCAA_BASKETBALL = 9005,
-    NHL = 9006,
-    UFC = 9007,
-    WNBA = 9008,
-    MLS = 9010,
-    EPL = 9011,
-    LIGUE_ONE = 9012,
-    BUNDESLIGA = 9013,
-    LA_LIGA = 9014,
-    SERIE_A = 9015,
-    UEFA_CL = 9016,
-    UEFA_EL = 9017,
-    J1_LEAGUE = 9019,
-    FORMULA1 = 9445,
-    MOTOGP = 9497,
-    CSGO = 18977,
-    DOTA2 = 18983,
-    LOL = 19138,
-    IPL = 9020,
-    EUROLEAGUE = 9399,
-    BOXING = 18196,
-    EREDIVISIE = 9057,
-    PRIMEIRA_LIGA = 9061,
-    COPA_LIBERTADORES = 9045,
-    IIHF_WORLD_CHAMPIONSHIP = 9033,
-    FIFA_WORLD_CUP_U20 = 9296,
-    T20_BLAST = 9021,
-    UEFA_EURO_QUALIFICATIONS = 9050,
-}
 
 export const ENETPULSE_SPORTS = [
     9153,
@@ -420,41 +523,40 @@ export const ENETPULSE_SPORTS = [
     9296,
     9050,
     9497,
+    18806,
+    18821,
+    9288,
+    9042,
+    19216,
+    9076,
+    9073,
+    9409,
+    9536,
+    9268,
 ];
 
-export const MLS_TAG = 9010;
+export const JSON_ODDS_SPORTS = [109021, 109121];
+
 export const FIFA_WC_TAG = 9018;
 export const FIFA_WC_U20_TAG = 9296;
 export const IIHF_WC_TAG = 9033;
-export const UEFA_TAGS = [9016, 9017];
+export const UEFA_TAGS = [9016, 9017, 18806, 18821, 9288, 9042, 19216, 9076, 9073];
 export const MOTOSPORT_TAGS = [9445, 9497];
-
-export const PERSON_COMPETITIONS = [9007, 9445, 9497, 9153, 9156];
-
-export enum BetType {
-    WINNER = 0,
-    SPREAD = 10001,
-    TOTAL = 10002,
-    DOUBLE_CHANCE = 10003,
-}
+export const GOLF_TAGS = [109021, 109121];
+export const GOLF_TOURNAMENT_WINNER_TAG = 109121;
 
 export const BetTypeNameMap: Record<BetType, string> = {
     [BetType.WINNER]: 'winner',
     [BetType.SPREAD]: 'spread',
     [BetType.TOTAL]: 'total',
     [BetType.DOUBLE_CHANCE]: 'double-chance',
+    [BetType.PLAYER_PROPS_STRIKEOUTS]: 'strikeouts',
+    [BetType.PLAYER_PROPS_HOMERUNS]: 'home runs',
+    [BetType.PLAYER_PROPS_PASSING_YARDS]: 'passing yards',
+    [BetType.PLAYER_PROPS_PASSING_TOUCHDOWNS]: 'passing touchdowns',
+    [BetType.PLAYER_PROPS_RUSHING_YARDS]: 'rushing yards',
+    [BetType.PLAYER_PROPS_RECEIVING_YARDS]: 'receiving yards',
 };
-
-export const MARKETS_COMBINATION: Array<BetType>[] = [
-    [0, 10002],
-    [10001, 10002],
-];
-
-export enum DoubleChanceMarketType {
-    HOME_TEAM_NOT_TO_LOSE = 'HomeTeamNotToLose',
-    NO_DRAW = 'NoDraw',
-    AWAY_TEAM_NOT_TO_LOSE = 'AwayTeamNotToLose',
-}
 
 export const SCORING_MAP: SportsMap = {
     9001: 'points',
@@ -492,6 +594,18 @@ export const SCORING_MAP: SportsMap = {
     9296: 'goals',
     9021: 'points',
     9050: 'goals',
+    109021: '',
+    109121: '',
+    18806: 'goals',
+    18821: 'goals',
+    9288: 'goals',
+    9042: 'goals',
+    19216: 'goals',
+    9076: 'goals',
+    9073: 'goals',
+    9409: 'points',
+    9536: 'goals',
+    9268: 'goals',
 };
 
 export const MATCH_RESOLVE_MAP: SportsMap = {
@@ -530,6 +644,18 @@ export const MATCH_RESOLVE_MAP: SportsMap = {
     9296: 'regular',
     9021: '',
     9050: 'regular',
+    109021: '',
+    109121: '',
+    18806: 'regular',
+    18821: 'regular',
+    9288: 'regular',
+    9042: 'regular',
+    19216: 'regular',
+    9076: 'regular',
+    9073: 'regular',
+    9409: 'overtime',
+    9536: 'regular',
+    9268: 'regular',
 };
 
 export const SPORT_PERIODS_MAP: SportsMap = {
@@ -566,4 +692,16 @@ export const SPORT_PERIODS_MAP: SportsMap = {
     9296: 'half',
     9021: 'inning',
     9050: 'half',
+    109021: '',
+    109121: '',
+    18806: 'half',
+    18821: 'half',
+    9288: 'half',
+    9042: 'half',
+    19216: 'half',
+    9076: 'half',
+    9073: 'half',
+    9409: 'quarter',
+    9536: 'half',
+    9268: 'half',
 };

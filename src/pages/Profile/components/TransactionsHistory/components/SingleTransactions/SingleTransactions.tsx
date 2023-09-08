@@ -20,12 +20,17 @@ import {
     getSpreadTotalText,
     getSymbolText,
 } from 'utils/markets';
-import { CollateralByNetworkId } from 'utils/network';
 import { TwitterIcon } from 'pages/Markets/Home/Parlay/components/styled-components';
 import ShareTicketModal, {
     ShareTicketModalProps,
 } from 'pages/Markets/Home/Parlay/components/ShareTicketModal/ShareTicketModal';
 import { ParlaysMarket } from 'types/markets';
+import { fixOneSideMarketCompetitorName } from 'utils/formatters/string';
+import { CollateralByNetworkId } from 'constants/network';
+import { ThemeInterface } from 'types/ui';
+import { useTheme } from 'styled-components';
+import { BetTypeNameMap } from 'constants/tags';
+import { BetType } from 'enums/markets';
 
 const TransactionsHistory: React.FC<{ searchText?: string }> = ({ searchText }) => {
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
@@ -33,6 +38,7 @@ const TransactionsHistory: React.FC<{ searchText?: string }> = ({ searchText }) 
     const networkId = useSelector((state: RootState) => getNetworkId(state));
 
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
 
     const [showShareTicketModal, setShowShareTicketModal] = useState(false);
     const [shareTicketModalData, setShareTicketModalData] = useState<ShareTicketModalProps>({
@@ -90,7 +96,10 @@ const TransactionsHistory: React.FC<{ searchText?: string }> = ({ searchText }) 
     return (
         <>
             <Table
-                tableHeadCellStyles={TableHeaderStyle}
+                tableHeadCellStyles={{
+                    ...TableHeaderStyle,
+                    color: theme.textColor.secondary,
+                }}
                 tableRowCellStyles={TableRowStyle}
                 onTableCellClick={(row: any, cell: any) => {
                     cell.column.id !== 'share' ? open(getEtherscanTxLink(networkId, row.original.hash)) : undefined;
@@ -118,7 +127,13 @@ const TransactionsHistory: React.FC<{ searchText?: string }> = ({ searchText }) 
                             return (
                                 <TableColumnClickable>
                                     <TableText>
-                                        {cellProps.cell.value.homeTeam} vs {cellProps.cell.value.awayTeam}
+                                        {cellProps.cell.value.playerName !== null
+                                            ? `${cellProps.cell.value.playerName} (${
+                                                  BetTypeNameMap[cellProps.cell.value.betType as BetType]
+                                              }) `
+                                            : cellProps.cell.value.isOneSideMarket
+                                            ? fixOneSideMarketCompetitorName(cellProps.cell.value.homeTeam)
+                                            : `${cellProps.cell.value.homeTeam} vs ${cellProps.cell.value.awayTeam}`}
                                     </TableText>
                                 </TableColumnClickable>
                             );
@@ -151,7 +166,7 @@ const TransactionsHistory: React.FC<{ searchText?: string }> = ({ searchText }) 
                                                 ? {
                                                       text: spreadTotalText,
                                                       textStyle: {
-                                                          backgroundColor: '#1A1C2B',
+                                                          backgroundColor: theme.background.primary,
                                                           fontSize: '10px',
                                                           top: '-7px',
                                                           left: '13px',
@@ -211,7 +226,9 @@ const TransactionsHistory: React.FC<{ searchText?: string }> = ({ searchText }) 
                         sortable: false,
                         Cell: (cellProps: any) => {
                             return (
-                                <TableColumnClickable>{getPositionStatus(cellProps.row.original)}</TableColumnClickable>
+                                <TableColumnClickable>
+                                    {getPositionStatus(cellProps.row.original, theme)}
+                                </TableColumnClickable>
                             );
                         },
                     },
@@ -258,21 +275,21 @@ const TransactionsHistory: React.FC<{ searchText?: string }> = ({ searchText }) 
     );
 };
 
-const getPositionStatus = (tx: any) => {
+const getPositionStatus = (tx: any, theme: ThemeInterface) => {
     if (tx.type !== 'buy') {
-        return <StatusWrapper color="#808080">SOLD</StatusWrapper>;
+        return <StatusWrapper color={theme.status.sold}>SOLD</StatusWrapper>;
     }
     if (tx.wholeMarket.isCanceled) {
-        return <StatusWrapper color="#808080">CANCELED</StatusWrapper>;
+        return <StatusWrapper color={theme.status.sold}>CANCELED</StatusWrapper>;
     }
     if (tx.wholeMarket.isResolved) {
         if (convertPositionNameToPosition(tx.position) === convertFinalResultToResultType(tx.wholeMarket.finalResult)) {
-            return <StatusWrapper color="#5FC694">WON</StatusWrapper>;
+            return <StatusWrapper color={theme.status.win}>WON</StatusWrapper>;
         } else {
-            return <StatusWrapper color="#E26A78">LOSS</StatusWrapper>;
+            return <StatusWrapper color={theme.status.loss}>LOSS</StatusWrapper>;
         }
     } else {
-        return <StatusWrapper color="#FFFFFF">OPEN</StatusWrapper>;
+        return <StatusWrapper color={theme.status.open}>OPEN</StatusWrapper>;
     }
 };
 
@@ -314,7 +331,6 @@ const TableHeaderStyle: React.CSSProperties = {
     lineHeight: '12px',
     textAlign: 'center',
     textTransform: 'uppercase',
-    color: '#5F6180',
     justifyContent: 'center',
     paddingLeft: 0,
 };

@@ -1,34 +1,35 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
-import MatchInfo from './components/MatchInfo';
-import BackToLink from 'pages/Markets/components/BackToLink';
-import { SportMarketChildMarkets, SportMarketInfo, SportMarketLiveResult } from 'types/markets';
-import Positions from './components/Positions';
-import { useSelector } from 'react-redux';
-import { RootState } from 'redux/rootReducer';
-import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivRow } from 'styles/common';
-import styled from 'styled-components';
-import { buildHref, navigateTo } from 'utils/routes';
-import ROUTES from 'constants/routes';
-import { INCENTIVIZED_GRAND_SLAM, INCENTIVIZED_LEAGUE } from 'constants/markets';
-import Tooltip from 'components/Tooltip';
-import { ReactComponent as OPLogo } from 'assets/images/optimism-logo.svg';
-import { ReactComponent as ThalesLogo } from 'assets/images/thales-logo-small-white.svg';
 import { ReactComponent as ArbitrumLogo } from 'assets/images/arbitrum-logo.svg';
-import Parlay from 'pages/Markets/Home/Parlay';
-import Transactions from '../Transactions';
-import { getIsAppReady, getIsMobile } from 'redux/modules/app';
-import { GAME_STATUS, MAIN_COLORS } from 'constants/ui';
-import { BetType, ENETPULSE_SPORTS, SPORTS_TAGS_MAP, SPORT_PERIODS_MAP } from 'constants/tags';
+import { ReactComponent as OPLogo } from 'assets/images/optimism-logo.svg';
 import FooterSidebarMobile from 'components/FooterSidebarMobile';
+import Tooltip from 'components/Tooltip';
+import { INCENTIVIZED_GRAND_SLAM, INCENTIVIZED_LEAGUE } from 'constants/markets';
+import ROUTES from 'constants/routes';
+import { ENETPULSE_SPORTS, JSON_ODDS_SPORTS, SPORTS_TAGS_MAP, SPORT_PERIODS_MAP } from 'constants/tags';
+import { GAME_STATUS } from 'constants/ui';
+import Parlay from 'pages/Markets/Home/Parlay';
 import ParlayMobileModal from 'pages/Markets/Home/Parlay/components/ParlayMobileModal';
-import useSportMarketLiveResultQuery from 'queries/markets/useSportMarketLiveResultQuery';
-import Web3 from 'web3';
-import { getOrdinalNumberLabel } from 'utils/ui';
-import { getNetworkId } from 'redux/modules/wallet';
+import BackToLink from 'pages/Markets/components/BackToLink';
 import useEnetpulseAdditionalDataQuery from 'queries/markets/useEnetpulseAdditionalDataQuery';
-import { NetworkIdByName } from 'utils/network';
-import CombinedPositions from './components/CombinedPositions/CombinedPositions';
+import useSportMarketLiveResultQuery from 'queries/markets/useSportMarketLiveResultQuery';
+import React, { useEffect, useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { getIsAppReady, getIsMobile } from 'redux/modules/app';
+import { getNetworkId } from 'redux/modules/wallet';
+import { RootState } from 'redux/rootReducer';
+import styled, { useTheme } from 'styled-components';
+import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivRow } from 'styles/common';
+import { SportMarketChildMarkets, SportMarketInfo, SportMarketLiveResult } from 'types/markets';
+import { Network } from 'enums/network';
+import { buildHref, navigateTo } from 'utils/routes';
+import { getOrdinalNumberLabel } from 'utils/ui';
+import Web3 from 'web3';
+import Transactions from '../Transactions';
+import CombinedPositions from './components/CombinedPositions';
+import MatchInfo from './components/MatchInfo';
+import Positions from './components/Positions';
+import { BetType } from 'enums/markets';
+import { ThemeInterface } from 'types/ui';
 
 type MarketDetailsPropType = {
     market: SportMarketInfo;
@@ -36,6 +37,7 @@ type MarketDetailsPropType = {
 
 const MarketDetails: React.FC<MarketDetailsPropType> = ({ market }) => {
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const networkId = useSelector((state: RootState) => getNetworkId(state));
@@ -45,6 +47,24 @@ const MarketDetails: React.FC<MarketDetailsPropType> = ({ market }) => {
         spreadMarkets: market.childMarkets.filter((childMarket) => childMarket.betType == BetType.SPREAD),
         totalMarkets: market.childMarkets.filter((childMarket) => childMarket.betType == BetType.TOTAL),
         doubleChanceMarkets: market.childMarkets.filter((childMarket) => childMarket.betType == BetType.DOUBLE_CHANCE),
+        strikeOutsMarkets: market.childMarkets.filter(
+            (childMarket) => childMarket.betType == BetType.PLAYER_PROPS_STRIKEOUTS
+        ),
+        homeRunsMarkets: market.childMarkets.filter(
+            (childMarket) => childMarket.betType == BetType.PLAYER_PROPS_HOMERUNS
+        ),
+        passingYardsMarkets: market.childMarkets.filter(
+            (childMarket) => childMarket.betType == BetType.PLAYER_PROPS_PASSING_YARDS
+        ),
+        rushingYardsMarkets: market.childMarkets.filter(
+            (childMarket) => childMarket.betType == BetType.PLAYER_PROPS_RUSHING_YARDS
+        ),
+        receivingYardsMarkets: market.childMarkets.filter(
+            (childMarket) => childMarket.betType == BetType.PLAYER_PROPS_RECEIVING_YARDS
+        ),
+        passingTouchdownsMarkets: market.childMarkets.filter(
+            (childMarket) => childMarket.betType == BetType.PLAYER_PROPS_PASSING_TOUCHDOWNS
+        ),
     };
 
     const combinedMarkets = market.combinedMarketsData ? market.combinedMarketsData : [];
@@ -61,26 +81,27 @@ const MarketDetails: React.FC<MarketDetailsPropType> = ({ market }) => {
 
     const childMarkets: SportMarketChildMarkets = lastValidChildMarkets;
 
-    const showAMM = !market.isResolved && !market.isCanceled && market.isOpen && !market.isPaused;
+    const isGameStarted = market.maturityDate < new Date();
+    const showAMM = !market.isResolved && !market.isCanceled && !isGameStarted && !market.isPaused;
 
-    const isGameCancelled = market.isCanceled || (market.isOpen && market.isResolved);
+    const isGameCancelled = market.isCanceled || (!isGameStarted && market.isResolved);
     const isGameResolved = market.isResolved || market.isCanceled;
-    const isPendingResolution = !market.isOpen && !isGameResolved;
+    const isPendingResolution = isGameStarted && !isGameResolved;
     const isGamePaused = market.isPaused && !isGameResolved;
-    const showStatus = market.isResolved || market.isCanceled || !market.isOpen || market.isPaused;
+    const showStatus = market.isResolved || market.isCanceled || isGameStarted || market.isPaused;
     const gameIdString = Web3.utils.hexToAscii(market.gameId);
     const isEnetpulseSport = ENETPULSE_SPORTS.includes(Number(market.tags[0]));
+    const isJsonOddsSport = JSON_ODDS_SPORTS.includes(Number(market.tags[0]));
     const gameDate = new Date(market.maturityDate).toISOString().split('T')[0];
     const [liveResultInfo, setLiveResultInfo] = useState<SportMarketLiveResult | undefined>(undefined);
 
     const useLiveResultQuery = useSportMarketLiveResultQuery(gameIdString, {
-        enabled: isAppReady && !isEnetpulseSport,
+        enabled: isAppReady && !isEnetpulseSport && !isJsonOddsSport,
     });
 
     const useEnetpulseLiveResultQuery = useEnetpulseAdditionalDataQuery(gameIdString, gameDate, market.tags[0], {
         enabled: isAppReady && isEnetpulseSport,
     });
-
     useEffect(() => {
         if (isEnetpulseSport) {
             if (useEnetpulseLiveResultQuery.isSuccess && useEnetpulseLiveResultQuery.data) {
@@ -124,7 +145,7 @@ const MarketDetails: React.FC<MarketDetailsPropType> = ({ market }) => {
                                         }}
                                         values={{
                                             rewards:
-                                                networkId !== NetworkIdByName.ArbitrumOne
+                                                networkId !== Network.ArbitrumOne
                                                     ? INCENTIVIZED_LEAGUE.opRewards
                                                     : INCENTIVIZED_LEAGUE.thalesRewards,
                                         }}
@@ -133,7 +154,7 @@ const MarketDetails: React.FC<MarketDetailsPropType> = ({ market }) => {
                                 component={
                                     <IncentivizedLeague>
                                         <IncentivizedTitle>{t('market.incentivized-market')}</IncentivizedTitle>
-                                        {networkId !== NetworkIdByName.ArbitrumOne ? <OPLogo /> : <ThalesLogo />}
+                                        {networkId !== Network.ArbitrumOne ? <OPLogo /> : <ArbitrumLogo />}
                                     </IncentivizedLeague>
                                 }
                             ></Tooltip>
@@ -156,7 +177,7 @@ const MarketDetails: React.FC<MarketDetailsPropType> = ({ market }) => {
                                         }}
                                         values={{
                                             rewards:
-                                                networkId !== NetworkIdByName.ArbitrumOne
+                                                networkId !== Network.ArbitrumOne
                                                     ? INCENTIVIZED_GRAND_SLAM.opRewards
                                                     : INCENTIVIZED_GRAND_SLAM.arbRewards,
                                         }}
@@ -165,7 +186,7 @@ const MarketDetails: React.FC<MarketDetailsPropType> = ({ market }) => {
                                 component={
                                     <IncentivizedLeague>
                                         <IncentivizedTitle>{t('market.incentivized-market')}</IncentivizedTitle>
-                                        {networkId !== NetworkIdByName.ArbitrumOne ? <OPLogo /> : <ArbitrumLogo />}
+                                        {networkId !== Network.ArbitrumOne ? <OPLogo /> : <ArbitrumLogo />}
                                     </IncentivizedLeague>
                                 }
                             ></Tooltip>
@@ -173,9 +194,9 @@ const MarketDetails: React.FC<MarketDetailsPropType> = ({ market }) => {
                 </HeaderWrapper>
                 <MatchInfo market={market} liveResultInfo={liveResultInfo} isEnetpulseSport={isEnetpulseSport} />
                 {showStatus && (
-                    <Status backgroundColor={isGameCancelled ? MAIN_COLORS.BACKGROUNDS.RED : MAIN_COLORS.LIGHT_GRAY}>
+                    <Status backgroundColor={isGameCancelled ? theme.status.canceled : theme.background.secondary}>
                         {isPendingResolution ? (
-                            !isEnetpulseSport ? (
+                            !isEnetpulseSport && !isJsonOddsSport ? (
                                 <ResultContainer>
                                     <ResultLabel>
                                         {liveResultInfo?.homeScore + ' - ' + liveResultInfo?.awayScore}{' '}
@@ -239,7 +260,7 @@ const MarketDetails: React.FC<MarketDetailsPropType> = ({ market }) => {
                         ) : (
                             <ResultContainer>
                                 <ResultLabel>
-                                    {market.isEnetpulseRacing
+                                    {market.isOneSideMarket
                                         ? market.homeScore == 1
                                             ? t('markets.market-card.race-winner')
                                             : t('markets.market-card.no-win')
@@ -278,21 +299,64 @@ const MarketDetails: React.FC<MarketDetailsPropType> = ({ market }) => {
                     </Status>
                 )}
                 <>
-                    <Positions markets={[market]} betType={BetType.WINNER} />
+                    <Positions markets={[market]} betType={BetType.WINNER} showOdds={showAMM} />
                     {childMarkets.doubleChanceMarkets.length > 0 && (
                         <Positions
                             markets={childMarkets.doubleChanceMarkets}
                             betType={BetType.DOUBLE_CHANCE}
                             areDoubleChanceMarkets
+                            showOdds={showAMM}
                         />
                     )}
                     {childMarkets.spreadMarkets.length > 0 && (
-                        <Positions markets={childMarkets.spreadMarkets} betType={BetType.SPREAD} />
+                        <Positions markets={childMarkets.spreadMarkets} betType={BetType.SPREAD} showOdds={showAMM} />
                     )}
                     {childMarkets.totalMarkets.length > 0 && (
-                        <Positions markets={childMarkets.totalMarkets} betType={BetType.TOTAL} />
+                        <Positions markets={childMarkets.totalMarkets} betType={BetType.TOTAL} showOdds={showAMM} />
                     )}
                     {combinedMarkets.length > 0 && <CombinedPositions combinedMarkets={combinedMarkets} />}
+                    {childMarkets.strikeOutsMarkets.length > 0 && (
+                        <Positions
+                            markets={childMarkets.strikeOutsMarkets}
+                            betType={BetType.PLAYER_PROPS_STRIKEOUTS}
+                            showOdds={showAMM}
+                        />
+                    )}
+                    {childMarkets.homeRunsMarkets.length > 0 && (
+                        <Positions
+                            markets={childMarkets.homeRunsMarkets}
+                            betType={BetType.PLAYER_PROPS_HOMERUNS}
+                            showOdds={showAMM}
+                        />
+                    )}
+                    {childMarkets.rushingYardsMarkets.length > 0 && (
+                        <Positions
+                            markets={childMarkets.rushingYardsMarkets}
+                            betType={BetType.PLAYER_PROPS_RUSHING_YARDS}
+                            showOdds={showAMM}
+                        />
+                    )}
+                    {childMarkets.passingYardsMarkets.length > 0 && (
+                        <Positions
+                            markets={childMarkets.passingYardsMarkets}
+                            betType={BetType.PLAYER_PROPS_PASSING_YARDS}
+                            showOdds={showAMM}
+                        />
+                    )}
+                    {childMarkets.receivingYardsMarkets.length > 0 && (
+                        <Positions
+                            markets={childMarkets.receivingYardsMarkets}
+                            betType={BetType.PLAYER_PROPS_RECEIVING_YARDS}
+                            showOdds={showAMM}
+                        />
+                    )}
+                    {childMarkets.passingTouchdownsMarkets.length > 0 && (
+                        <Positions
+                            markets={childMarkets.passingTouchdownsMarkets}
+                            betType={BetType.PLAYER_PROPS_PASSING_TOUCHDOWNS}
+                            showOdds={showAMM}
+                        />
+                    )}
                 </>
                 <Transactions market={market} />
             </MainContainer>
@@ -377,14 +441,14 @@ const IncentivizedTitle = styled.span`
 const Status = styled(FlexDivCentered)<{ backgroundColor?: string }>`
     width: 100%;
     border-radius: 15px;
-    background-color: ${(props) => props.backgroundColor || MAIN_COLORS.LIGHT_GRAY};
+    background-color: ${(props) => props.backgroundColor || props.theme.background.secondary};
     padding: 10px 50px;
     margin-bottom: 7px;
     font-weight: 600;
     font-size: 21px;
     line-height: 110%;
     text-transform: uppercase;
-    color: ${MAIN_COLORS.TEXT.WHITE};
+    color: ${(props) => props.theme.textColor.primary};
 `;
 
 const ResultContainer = styled(FlexDivColumnCentered)`
@@ -400,7 +464,7 @@ const InfoLabel = styled.label`
     }
 
     &.red {
-        color: #e26a78;
+        color: ${(props) => props.theme.status.loss};
     }
 
     &.football {
@@ -410,7 +474,7 @@ const InfoLabel = styled.label`
     }
 
     &.blink {
-        color: #e26a78;
+        color: ${(props) => props.theme.status.loss};
         font-weight: 700;
         animation: blinker 1.5s step-start infinite;
     }

@@ -16,6 +16,7 @@ import {
     ledgerWallet,
     imTokenWallet,
     trustWallet,
+    rabbyWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 import { configureChains, createClient, WagmiConfig } from 'wagmi';
 import { optimism, optimismGoerli, arbitrum } from 'wagmi/chains';
@@ -24,6 +25,9 @@ import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { publicProvider } from 'wagmi/providers/public';
 import WalletDisclaimer from 'components/WalletDisclaimer';
 import { merge } from 'lodash';
+import { Network } from 'enums/network';
+import { ThemeMap } from 'constants/ui';
+import { getDefaultTheme } from 'redux/modules/ui';
 
 dotenv.config();
 
@@ -38,13 +42,13 @@ type RpcProvider = {
 };
 
 const CHAIN_TO_RPC_PROVIDER_NETWORK_NAME: Record<number, RpcProvider> = {
-    10: {
+    [Network.OptimismMainnet]: {
         ankr: 'optimism',
         chainnode: 'optimism-mainnet',
         blast: 'optimism-mainnet',
     },
-    420: { ankr: 'optimism_testnet', chainnode: 'optimism-goerli', blast: 'optimism-goerli' },
-    42161: { ankr: 'arbitrum', chainnode: 'arbitrum-one', blast: 'arbitrum-one' },
+    [Network.OptimismGoerli]: { ankr: 'optimism_testnet', chainnode: 'optimism-goerli', blast: 'optimism-goerli' },
+    [Network.ArbitrumOne]: { ankr: 'arbitrum', chainnode: 'arbitrum-one', blast: 'arbitrum-one' },
 };
 
 const STALL_TIMEOUT = 2000;
@@ -72,19 +76,21 @@ const { chains, provider } = configureChains(
     ]
 );
 
+const projectId = process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID || '';
 const connectors = connectorsForWallets([
     {
         groupName: 'Recommended',
         wallets: [
-            metaMaskWallet({ chains }),
-            walletConnectWallet({ chains }),
+            metaMaskWallet({ projectId, chains }),
+            walletConnectWallet({ projectId, chains }),
+            rabbyWallet({ chains }),
             braveWallet({ chains }),
-            ledgerWallet({ chains }),
-            trustWallet({ chains }),
+            ledgerWallet({ projectId, chains }),
+            trustWallet({ projectId, chains }),
             injectedWallet({ chains }),
             coinbaseWallet({ appName: 'Overtime', chains }),
-            rainbowWallet({ chains }),
-            imTokenWallet({ chains }),
+            rainbowWallet({ projectId, chains }),
+            imTokenWallet({ projectId, chains }),
         ],
     },
 ]);
@@ -113,7 +119,8 @@ const instance = createInstance({
     linkTracking: true, // optional, default value: true
 });
 
-const customTheme = merge(darkTheme(), { colors: { modalBackground: '#1A1C2B' } });
+const theme = getDefaultTheme();
+const customTheme = merge(darkTheme(), { colors: { modalBackground: ThemeMap[theme].background.primary } });
 
 const Root: React.FC<RootProps> = ({ store }) => {
     return (
