@@ -1,10 +1,9 @@
 import { useQuery, UseQueryOptions } from 'react-query';
 import QUERY_KEYS from '../../constants/queryKeys';
-import { bigNumberFormmaterWithDecimals } from 'utils/formatters/ethers';
+import { bigNumberFormatter, getDefaultDecimalsForNetwork } from 'thales-utils';
 import networkConnector from 'utils/networkConnector';
 import { Network } from 'enums/network';
 import { UserVaultData } from 'types/vault';
-import { getDefaultDecimalsForNetwork } from 'utils/network';
 import { isParlayVault } from 'constants/vault';
 
 const useUserVaultDataQuery = (
@@ -32,12 +31,12 @@ const useUserVaultDataQuery = (
                         ? await sportVaultDataContract.getUserParlayVaultData(vaultAddress, walletAddress)
                         : await sportVaultDataContract.getUserSportVaultData(vaultAddress, walletAddress);
 
-                    userVaultData.balanceCurrentRound = bigNumberFormmaterWithDecimals(
+                    userVaultData.balanceCurrentRound = bigNumberFormatter(
                         contractUserVaultData.balanceCurrentRound,
                         getDefaultDecimalsForNetwork(networkId)
                     );
 
-                    userVaultData.balanceNextRound = bigNumberFormmaterWithDecimals(
+                    userVaultData.balanceNextRound = bigNumberFormatter(
                         contractUserVaultData.balanceNextRound,
                         getDefaultDecimalsForNetwork(networkId)
                     );

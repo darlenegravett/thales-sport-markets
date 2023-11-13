@@ -20,17 +20,17 @@ import Checkbox from 'components/fields/Checkbox';
 import { getAddress, isAddress } from 'ethers/lib/utils';
 import { LINKS } from 'constants/links';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
-import { Network } from 'enums/network';
 import { refetchBalances } from 'utils/queryConnector';
 import TextInput from '../fields/TextInput/TextInput';
-import { stableCoinParser } from 'utils/formatters/ethers';
+import { coinParser } from 'thales-utils';
 import { getDefaultCollateral } from 'utils/collaterals';
+import { SupportedNetwork } from 'types/network';
 
 type MintVoucherModalProps = {
     onClose: () => void;
 };
 
-const getVoucherOptions = (networkId: Network): Array<{ value: number; label: string }> => {
+const getVoucherOptions = (networkId: SupportedNetwork): Array<{ value: number; label: string }> => {
     const collateral = getDefaultCollateral(networkId);
     return [
         { value: 5, label: `5 ${collateral}` },
@@ -98,7 +98,7 @@ const MintVoucherModal: React.FC<MintVoucherModalProps> = ({ onClose }) => {
             const sUSDContractWithSigner = sUSDContract.connect(signer);
             const getAllowance = async () => {
                 try {
-                    const parsedAmount = stableCoinParser(Number(amount).toString(), networkId);
+                    const parsedAmount = coinParser(Number(amount).toString(), networkId);
                     const allowance = await checkAllowance(
                         parsedAmount,
                         sUSDContractWithSigner,
@@ -159,7 +159,7 @@ const MintVoucherModal: React.FC<MintVoucherModalProps> = ({ onClose }) => {
             setIsSubmitting(true);
             try {
                 const overtimeVoucherContractWithSigner = overtimeVoucherContract.connect(signer);
-                const parsedAmount = stableCoinParser(Number(amount).toString(), networkId);
+                const parsedAmount = coinParser(Number(amount).toString(), networkId);
 
                 const tx = await overtimeVoucherContractWithSigner.mint(
                     isAnotherWallet ? getAddress(recipient) : getAddress(walletAddress),

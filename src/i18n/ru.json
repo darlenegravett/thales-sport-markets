@@ -12,7 +12,9 @@
             "approve": "Approve",
             "get-usd-progress": "Minting {{amount}}...",
             "disclaimer": "By connecting a wallet you acknowledge that you have read and understand the Overtime Markets <disclaimer>disclaimer</disclaimer> and agree to its <terms>Terms of Use</terms>.",
-            "wallet-info": "Информация о кошельке"
+            "wallet-info": "Информация о кошельке",
+            "approve-parlay": "Одобрить ParlayAMM",
+            "approve-sports": "Утвердить SportsAMM"
         },
         "voucher": {
             "remaining-amount": "Remaining amount",
@@ -62,7 +64,10 @@
             "approve-label": "Approve {{currencyKey}}",
             "approve-progress-label": "Approving {{currencyKey}}...",
             "approve-all-label": "Approve all",
-            "custom-amount-label": "Approve amount of"
+            "custom-amount-label": "Approve amount of",
+            "approve-progress": "Одобрение...",
+            "approve": "Утвердить",
+            "approve-swap": "Одобрить обмен на {{currencyKey}}"
         },
         "unsupported-network": {
             "title": "Oops! You are on the wrong network!",
@@ -277,7 +282,8 @@
         "race-starts": "Старт гонки",
         "back": "Назад",
         "apply-filters": "Применить фильтры",
-        "incentivized-market": "СТИМУЛИРОВАННЫЙ РЫНОК"
+        "incentivized-market": "СТИМУЛИРОВАННЫЙ РЫНОК",
+        "number-of-rounds": "Общее количество раундов"
     },
     "markets": {
         "market-card": {
@@ -306,13 +312,25 @@
                 "strikeouts": "Вычеркивания",
                 "rushing yards": "Стремительные ярды",
                 "passing yards": "Пасовые ярды",
-                "passing touchdowns": "Проходящие тачдауны"
+                "passing touchdowns": "Проходящие тачдауны",
+                "scoring touchdown": "Кто забьет тачдаун в игре?",
+                "field goals made": "Голы с игры забиты",
+                "pitcher hits allowed": "Удары питчера разрешены",
+                "shots": "Выстрелы",
+                "points": "Точки",
+                "goals": "Кто забьет гол в игре?",
+                "hits recorded": "Записано хитов",
+                "rebounds": "Подборы",
+                "assists": "помогает",
+                "triple double": "Трипл-дабл",
+                "double double": "Дабл-дабл"
             },
             "odd-tooltip": {
                 "scoring": {
                     "goals": "goals",
                     "points": "points",
-                    "sets": "наборы"
+                    "sets": "наборы",
+                    "rounds": "раунды"
                 },
                 "match-resolve": {
                     "regular": "in regular time",
@@ -348,7 +366,30 @@
                     "passing-yards-under": "У {{team}} будет меньше пасовых ярдов, чем у {{scoring}}",
                     "home-runs-under": "У {{team}} будет меньше хоум-ранов, чем у {{scoring}}",
                     "passing-touchdowns-under": "У {{team}} будет меньше тачдаунов в пас, чем у {{scoring}}",
-                    "passing-touchdowns-over": "У команды {{team}} будет больше тачдаунов в пас, чем у команды {{scoring}}"
+                    "passing-touchdowns-over": "У команды {{team}} будет больше тачдаунов в пас, чем у команды {{scoring}}",
+                    "touchdowns": "{{team}} забьет тачдаун в игре",
+                    "field-goals-made-under": "У команды {{team}} будет забито меньше голов с игры, чем у команды {{scoring}}",
+                    "field-goals-made-over": "У команды {{team}} будет забито больше мячей с игры, чем у команды {{scoring}}",
+                    "info": {
+                        "scoring touchdown": "Прием, рывок, возврат панта, ответный удар, тачдауны защиты и перехвата засчитываются в результат."
+                    },
+                    "pitcher-hits-allowed-under": "У {{team}} будет меньше разрешенных попаданий, чем у {{scoring}}",
+                    "pitcher-hits-allowed-over": "У {{team}} будет разрешено больше попаданий, чем у {{scoring}}",
+                    "points-under": "{{team}} наберет меньше очков, чем {{scoring}}",
+                    "shots-over": "У {{team}} будет больше бросков, чем у {{scoring}}",
+                    "shots-under": "У {{team}} будет меньше бросков, чем у {{scoring}}",
+                    "goals": "{{team}} забьет гол в игре",
+                    "points-over": "{{team}} наберет больше очков, чем {{scoring}}",
+                    "hits-recorded-over": "У {{team}} будет записано больше попаданий, чем у {{scoring}}",
+                    "hits-recorded-under": "У {{team}} будет записано меньше попаданий, чем у {{scoring}}",
+                    "assists-under": "У {{team}} будет меньше результативных передач, чем у {{scoring}}",
+                    "rebounds-under": "У {{team}} будет меньше подборов, чем у {{scoring}}",
+                    "assists-over": "У команды {{team}} будет больше результативных передач, чем у команды {{scoring}}",
+                    "rebounds-over": "У {{team}} будет больше подборов, чем у {{scoring}}",
+                    "double-double-no": "{{team}} не забьет дабл-дабл",
+                    "triple-double-yes": "{{team}} забьет трипл-дабл",
+                    "double-double-yes": "{{team}} забьет дабл-дабл",
+                    "triple-double-no": "{{team}} не забьет трипл-дабл"
                 }
             },
             "starts-in": "Начинается через",
@@ -363,7 +404,8 @@
             "race-winner": "Победитель",
             "see-more-markets": "посмотреть рынки реквизита игроков",
             "see-more-markets-mobile": "реквизит игрока",
-            "player-props": "Реквизит игрока"
+            "player-props": "Реквизит игрока",
+            "resolved": "Решено"
         },
         "market-details": {
             "price": "Price",
@@ -412,7 +454,10 @@
                 "max-combined-markets": "Максимальное количество комбинированных рынков в Parlay составляет {{max}}.",
                 "amm-contract-paused": "Экспресс AMM приостановлен",
                 "unique-players": "Нельзя дважды добавить одного и того же участника в экспресс. {{existingParticipant}} уже находится в Parlay",
-                "same-event-participant": "Поддерживается только один участник на событие. Невозможно добавить {{addedParticipant}}, поскольку {{existingParticipant}} уже находится в Parlay"
+                "same-event-participant": "Поддерживается только один участник на событие. Невозможно добавить {{addedParticipant}}, поскольку {{existingParticipant}} уже находится в Parlay",
+                "same-game-different-player-props": "Не поддерживается объединение различных категорий реквизита игрока.",
+                "already-added-combined-positions": "Невозможно объединить позиции с одного рынка с помощью комбинированных позиций.",
+                "player-props-and-other-positions": "Не поддерживается объединение позиций реквизита игрока с другими позициями с того же рынка."
             },
             "empty-title": "Нет позиций",
             "empty-description": "Добавьте позицию, выберите рынок и сделайте свой выбор.",
@@ -448,7 +493,10 @@
             "toggle-parlay": {
                 "multi-single": "Одинокий",
                 "parlay": "экспресс"
-            }
+            },
+            "pay-with-voucher": "Оплатить ваучером",
+            "total-to-pay": "Итого к оплате",
+            "in-wallet": "В кошельке"
         },
         "discounted-per": "Со скидкой согласно",
         "nav-menu": {
@@ -607,7 +655,10 @@
             "starts": "Старт",
             "result": "Результат",
             "position-size": "Размер позиции",
-            "claim-all": "Требовать все"
+            "claim-all": "Требовать все",
+            "approve-swap-tooltip": "Чтобы получить выплату в {{currencyKey}}, вам необходимо одобрить обмен с {{defaultCurrency}} на {{currencyKey}}.",
+            "payout-in": "Выплата в",
+            "claim-progress": "Утверждение..."
         },
         "messages": {
             "no-claimable": "У вас нет требуемых должностей",
@@ -828,7 +879,8 @@
             "period-end-label": "The period ends in",
             "period-ended-label": "Period ended",
             "bi-weekly-period": "Bi-weekly period"
-        }
+        },
+        "warning2": "Пользователи, которые покрыли 50% или более потенциальных комбинаций своих выигрышных билетов, будут дисквалифицированы."
     },
     "wizard": {
         "title": "Get Started!",
@@ -955,5 +1007,39 @@
         "single-lp": "Одиночный LP",
         "parlay-lp": "Парлай ЛП",
         "description-parlay": "<h1>Описание</h1><p> Предоставление ликвидности предполагает, что пользователи вносят залог в стабильной монете в пул ликвидности на основе смарт-контракта для торговли в сверхурочное время. Внесенный залог используется для облегчения торговли на Overtime&#39;s Parlay AMM.</p><p> Чтобы иметь возможность обеспечивать ликвидность, вам необходимо делать ставки на THALES. Для каждого кошелька нет максимального предела, и вы можете внести максимум 1 {{currency}} за {{thalesStakedAmount}} THALES, поставленных до тех пор, пока пул ликвидности не будет заполнен.</p><p> В конце каждого раунда пропорциональная доля PnL этого раунда будет добавлена к вашему депонированному балансу.</p><p> Если вы хотите вывести средства, вы можете сообщить об этом в любое время в течение текущего раунда, и в конце раунда сумма, которую вы указали для снятия (включая PnL этого раунда), будет отправлена вам. Минимальная сумма для вывода установлена на уровне 10%.</p><p> Если вы решите отказаться от стейкинга THALES при предоставлении ликвидности, имейте в виду, что вам сначала нужно подать сигнал о выводе средств из пула ликвидности.</p><p> Предоставление ликвидности подвергает вас различным рискам, включая потенциальные убытки из-за выигрыша пользователей в торговле, а также риски безопасности смарт-контрактов. Перед внесением депозита убедитесь, что вы понимаете эти риски.</p><p><tipLink> ТИП-142</tipLink> имеет более подробную информацию о технической реализации предоставления ликвидности Overtime.</p>"
+    },
+    "seo": {
+        "home": {
+            "description": "Войдите в мир лучшей сетевой букмекерской конторы Web3. Закрепите позиции в более чем 12 видах спорта и более чем в 40 лигах.",
+            "title": "Рынки сверхурочной работы: букмекерская контора Premier Web3"
+        },
+        "markets": {
+            "description": "Присоединяйтесь к лучшей букмекерской конторе Web3 на рынке. Закрепите позиции в ведущих лигах, таких как НФЛ, НБА, UCL, EPL и других.",
+            "title": "Рынки сверхурочных: рынки букмекерских контор Web3 для более чем 40 лиг"
+        },
+        "vaults": {
+            "title": "Хранилища сверхурочных рынков: автоматическая торговля",
+            "description": "Внесите активы в хранилище Overtime Markets и позвольте нашему автоматическому торговому механизму применить выбранную вами стратегию."
+        },
+        "parlay-leaderboard": {
+            "description": "Overtime Markets — это букмекерская контора Web3 с лучшими на рынке бонусами, которые раздаются раз в две недели для игроков с экспресс-ставками! Проверьте таблицу лидеров и проверьте, прошли ли вы квалификацию здесь.",
+            "title": "Рынки сверхурочной работы: получайте вознаграждения за экспресс каждые 2 недели"
+        },
+        "referral": {
+            "description": "Пригласите друга на Overtime Markets и получайте процент от каждой сделки привлеченного вами человека, выплачиваемый в качестве залога в долларах США, мгновенно и прямо на ваш кошелек.",
+            "title": "Рынки сверхурочной работы: зарабатывайте реферальные вознаграждения"
+        },
+        "profile": {
+            "description": "Запрашивайте свои выигрыши, просматривайте свои результаты и отслеживайте депозиты, которые вы внесли в хранилища сверхурочного рынка.",
+            "title": "Рынок сверхурочной работы: Профиль пользователя"
+        },
+        "liquidity-pool": {
+            "title": "Рынки сверхурочной работы: будьте дома с нашим пулом ликвидности",
+            "description": "Станьте рынком сверхурочной работы! Внесите залог в стейблкоинах в пул ликвидности и получите шанс зарабатывать процент от PnL каждую неделю."
+        },
+        "single-market": {
+            "title": "Букмекерская контора Overtime Markets Web3: {{dynamicTitle}}",
+            "description": "{{dynamicTitle}}: наслаждайтесь лучшими на рынке букмекерскими коэффициентами Web3. Никакой регистрации не требуется. Полностью децентрализованные спортивные рынки."
+        }
     }
 }

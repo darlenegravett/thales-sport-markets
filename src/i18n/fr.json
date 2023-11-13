@@ -19,7 +19,9 @@
             "approve": "Autoriser",
             "get-usd-progress": "Création de {{amount}}...",
             "disclaimer": "By connecting a wallet you acknowledge that you have read and understand the Overtime Markets <disclaimer>disclaimer</disclaimer> and agree to its <terms>Terms of Use</terms>.",
-            "wallet-info": "Informations sur le portefeuille"
+            "wallet-info": "Informations sur le portefeuille",
+            "approve-parlay": "Approuver ParlayAMM",
+            "approve-sports": "Approuver SportsAMM"
         },
         "referral": {
             "link-copied": "Lien de parrainage copié !",
@@ -50,7 +52,10 @@
             "approve-label": "Autoriser {{currencyKey}}",
             "approve-progress-label": "Autoristation {{currencyKey}}...",
             "approve-all-label": "Autoriser tout",
-            "custom-amount-label": "Autoriser un montant de"
+            "custom-amount-label": "Autoriser un montant de",
+            "approve-progress": "Approuvant...",
+            "approve": "Approuver",
+            "approve-swap": "Approuver l'échange vers {{currencyKey}}"
         },
         "unsupported-network": {
             "title": "Oops ! Vous êtes sur le mauvais réseau !",
@@ -277,7 +282,8 @@
         "race-starts": "La course commence",
         "back": "Retour",
         "apply-filters": "Appliquer des filtres",
-        "incentivized-market": "MARCHÉ INCITATIF"
+        "incentivized-market": "MARCHÉ INCITATIF",
+        "number-of-rounds": "Nombre total de tours"
     },
     "markets": {
         "market-card": {
@@ -306,13 +312,25 @@
                 "passing yards": "Cours de dépassement",
                 "home runs": "Les circuits",
                 "passing touchdowns": "Passer des touchés",
-                "strikeouts": "Barrages"
+                "strikeouts": "Barrages",
+                "scoring touchdown": "Qui marquera un touchdown dans le match ?",
+                "field goals made": "Buts sur le terrain réussis",
+                "pitcher hits allowed": "Coups de lanceur autorisés",
+                "goals": "Qui marquera un but dans le match ?",
+                "shots": "Coups",
+                "points": "Points",
+                "hits recorded": "Hits enregistrés",
+                "assists": "Aides",
+                "rebounds": "Rebonds",
+                "triple double": "Triple-double",
+                "double double": "Double double"
             },
             "odd-tooltip": {
                 "scoring": {
                     "goals": "buts",
                     "points": "points",
-                    "sets": "ensembles"
+                    "sets": "ensembles",
+                    "rounds": "Les manches"
                 },
                 "match-resolve": {
                     "regular": "dans le temps régulier",
@@ -348,7 +366,30 @@
                     "passing-touchdowns-over": "{{team}} aura plus de touchés par passes que {{scoring}}",
                     "passing-touchdowns-under": "{{team}} aura moins de touchés par passe que {{scoring}}",
                     "receiving-yards-under": "{{team}} aura moins de yards sur réception que {{scoring}}",
-                    "rushing-yards-under": "{{team}} aura moins de yards au sol que {{scoring}}"
+                    "rushing-yards-under": "{{team}} aura moins de yards au sol que {{scoring}}",
+                    "touchdowns": "{{team}} marquera un touchdown dans le match",
+                    "field-goals-made-over": "{{team}} aura plus de buts sur le terrain que {{scoring}}",
+                    "field-goals-made-under": "{{team}} aura moins de buts sur le terrain que {{scoring}}",
+                    "info": {
+                        "scoring touchdown": "Les réceptions, les courses, les retours de botté de dégagement, les retours de coups de pied, les touchés défensifs et d'interception sont pris en compte dans le résultat."
+                    },
+                    "pitcher-hits-allowed-under": "{{team}} aura moins de coups autorisés que {{scoring}}",
+                    "pitcher-hits-allowed-over": "{{team}} aura plus de coups autorisés que {{scoring}}",
+                    "points-under": "{{team}} aura moins de points que {{scoring}}",
+                    "shots-under": "{{team}} aura moins de tirs que {{scoring}}",
+                    "goals": "{{team}} marquera un but dans le match",
+                    "shots-over": "{{team}} aura plus de tirs que {{scoring}}",
+                    "points-over": "{{team}} aura plus de points que {{scoring}}",
+                    "hits-recorded-over": "{{team}} aura plus de hits enregistrés que {{scoring}}",
+                    "hits-recorded-under": "{{team}} aura moins de coups sûrs enregistrés que {{scoring}}",
+                    "rebounds-over": "{{team}} aura plus de rebonds que {{scoring}}",
+                    "assists-over": "{{team}} aura plus de passes décisives que {{scoring}}",
+                    "rebounds-under": "{{team}} aura moins de rebonds que {{scoring}}",
+                    "assists-under": "{{team}} aura moins de passes décisives que {{scoring}}",
+                    "double-double-no": "{{team}} ne marquera pas de double-double",
+                    "double-double-yes": "{{team}} marquera un double-double",
+                    "triple-double-no": "{{team}} ne marquera pas de triple-double",
+                    "triple-double-yes": "{{team}} marquera un triple-double"
                 }
             },
             "starts-in": "Commence dans",
@@ -363,7 +404,8 @@
             "race-winner": "Gagnant",
             "see-more-markets-mobile": "accessoires de joueur",
             "see-more-markets": "voir les marchés d'accessoires de joueurs",
-            "player-props": "Accessoires de joueur"
+            "player-props": "Accessoires de joueur",
+            "resolved": "Résolu"
         },
         "market-details": {
             "wallet-info": {
@@ -412,7 +454,10 @@
                 "max-combined-markets": "Le nombre maximum de marchés combinés dans Parlay est de {{max}}.",
                 "amm-contract-paused": "Parlay AMM mis en pause",
                 "unique-players": "Impossible d'ajouter deux fois le même participant dans Parlay. {{existingParticipant}} est déjà dans Parlay",
-                "same-event-participant": "Un seul participant par événement est pris en charge. Impossible d'ajouter {{addedParticipant}} car {{existingParticipant}} est déjà dans Parlay"
+                "same-event-participant": "Un seul participant par événement est pris en charge. Impossible d'ajouter {{addedParticipant}} car {{existingParticipant}} est déjà dans Parlay",
+                "already-added-combined-positions": "Impossible de combiner des positions du même marché avec des positions combinées",
+                "player-props-and-other-positions": "Non pris en charge pour combiner les positions d'accessoires de joueur avec d'autres positions du même marché",
+                "same-game-different-player-props": "Non pris en charge pour combiner différentes catégories d'accessoires de joueur"
             },
             "payout": "Total reçu",
             "empty-title": "Aucune position",
@@ -448,7 +493,10 @@
             "toggle-parlay": {
                 "multi-single": "Seul",
                 "parlay": "Parler"
-            }
+            },
+            "pay-with-voucher": "Payer avec un bon",
+            "total-to-pay": "Le total à payer",
+            "in-wallet": "Dans le portefeuille"
         },
         "discounted-per": "Remise selon",
         "nav-menu": {
@@ -607,7 +655,10 @@
             "result": "Résultat",
             "starts": "Départs",
             "position-size": "Taille du poste",
-            "claim-all": "Réclamer tout"
+            "claim-all": "Réclamer tout",
+            "payout-in": "Paiement en",
+            "claim-progress": "Affirmant...",
+            "approve-swap-tooltip": "Pour obtenir un paiement en {{currencyKey}}, vous devez approuver le passage de {{defaultCurrency}} à {{currencyKey}}."
         },
         "messages": {
             "no-claimable": "Vous n'avez pas de poste réclamable",
@@ -828,7 +879,8 @@
             "period-end-label": "The period ends in",
             "period-ended-label": "Period ended",
             "bi-weekly-period": "Bi-weekly period"
-        }
+        },
+        "warning2": "Les utilisateurs ayant couvert 50 % ou plus des combinaisons potentielles de leurs billets gagnants seront disqualifiés."
     },
     "wizard": {
         "title": "C'est parti !",
@@ -955,5 +1007,39 @@
         "description-parlay": "<h1>Description</h1><p> La fourniture de liquidités implique que les utilisateurs déposent des garanties stables dans un pool de liquidités basé sur un contrat intelligent pour le trading des heures supplémentaires. La garantie déposée est utilisée pour faciliter la négociation sur l&#39;AMM Parlay d&#39;Overtime.</p><p> Pour pouvoir fournir des liquidités, vous devrez jalonner THALES. Il n&#39;y a pas de plafond maximum par portefeuille et vous pouvez déposer un maximum de 1 {{currency}} par {{thalesStakedAmount}} THALES jalonné jusqu&#39;à ce que le pool de liquidités soit rempli.</p><p> À la fin de chaque tour, la part proportionnelle du PnL de ce tour sera ajoutée à votre solde déposé.</p><p> Si vous souhaitez retirer, vous pouvez le signaler à tout moment pendant le tour en cours, et à la fin du tour, le montant que vous avez signalé pour le retrait (y compris le PnL de ce tour) vous est envoyé. Le montant minimum à retirer est fixé à 10%</p><p> Si vous décidez de retirer THALES tout en fournissant des liquidités, sachez que vous devrez d&#39;abord signaler un retrait du pool de liquidités.</p><p> L&#39;apport de liquidités vous expose à divers risques, notamment les pertes potentielles dues aux utilisateurs gagnants dans le trading ainsi que les risques de sécurité des contrats intelligents. Veuillez vous assurer que vous comprenez ces risques avant de déposer.</p><p><tipLink> CONSEIL-142</tipLink> a plus de détails sur la mise en œuvre technique de la fourniture de liquidités pour les heures supplémentaires.</p>",
         "parlay-lp": "Parlay LP",
         "single-lp": "LP unique"
+    },
+    "seo": {
+        "home": {
+            "title": "Marchés des heures supplémentaires : le premier site de paris sportifs Web3",
+            "description": "Entrez dans le monde du premier bookmaker Web3 en chaîne. Obtenez des positions dans plus de 12 sports et plus de 40 ligues."
+        },
+        "markets": {
+            "description": "Rejoignez le meilleur bookmaker web3 du marché. Obtenez des positions dans les meilleures ligues comme la NFL, la NBA, l'UCL, l'EPL et plus encore.",
+            "title": "Marchés des heures supplémentaires : marchés de paris sportifs Web3 pour plus de 40 ligues"
+        },
+        "vaults": {
+            "description": "Déposez des actifs dans le coffre-fort d'Overtime Markets et laissez notre mécanisme de trading automatisé déployer la stratégie de votre choix.",
+            "title": "Coffres-forts des marchés supplémentaires : trading automatisé"
+        },
+        "parlay-leaderboard": {
+            "title": "Marchés des heures supplémentaires : gagnez des récompenses Parlay toutes les 2 semaines",
+            "description": "Overtime Markets est un bookmaker web3 avec les meilleurs bonus bihebdomadaires du marché pour les joueurs parlay ! Consultez le classement et si vous vous êtes qualifié ici."
+        },
+        "referral": {
+            "description": "Parrainez un ami sur Overtime Markets et obtenez un pourcentage de chaque transaction de la personne que vous parrainez, payé en garantie en USD instantanément et directement dans votre portefeuille.",
+            "title": "Marchés des heures supplémentaires : gagnez des frais de référence"
+        },
+        "profile": {
+            "description": "Réclamez vos gains, examinez vos performances et suivez les dépôts que vous avez effectués dans les coffres-forts du marché des heures supplémentaires.",
+            "title": "Marché des heures supplémentaires : profil utilisateur"
+        },
+        "liquidity-pool": {
+            "description": "Soyez la maison du marché des heures supplémentaires ! Déposez une garantie stable en pièces dans le pool de liquidités pour avoir une chance de gagner un pourcentage du PnL chaque semaine.",
+            "title": "Marchés des heures supplémentaires : soyez la maison avec notre pool de liquidités"
+        },
+        "single-market": {
+            "description": "{{dynamicTitle}} : profitez des meilleures cotes de paris sportifs Web3 du marché. Aucune inscription nécessaire. Marchés sportifs entièrement décentralisés.",
+            "title": "Paris sportifs Web3 sur les marchés des heures supplémentaires : {{dynamicTitle}}"
+        }
     }
 }

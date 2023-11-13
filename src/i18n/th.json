@@ -12,7 +12,9 @@
             "approve": "อนุมัติ",
             "get-usd-progress": "กำลังมิ้นต์ {{amount}}...",
             "disclaimer": "By connecting a wallet you acknowledge that you have read and understand the Overtime Markets <disclaimer>disclaimer</disclaimer> and agree to its <terms>Terms of Use</terms>.",
-            "wallet-info": "ข้อมูลกระเป๋าเงิน"
+            "wallet-info": "ข้อมูลกระเป๋าเงิน",
+            "approve-parlay": "อนุมัติ ParlayAMM",
+            "approve-sports": "อนุมัติ SportsAMM"
         },
         "voucher": {
             "remaining-amount": "จำนวนเงินคงเหลือ",
@@ -62,7 +64,10 @@
             "approve-label": "อนุมัติ {{currencyKey}}",
             "approve-progress-label": "กำลังอนุมัติ {{currencyKey}}...",
             "approve-all-label": "อนุมัติทั้งหมด",
-            "custom-amount-label": "อนุมัติเป็นจำนวน"
+            "custom-amount-label": "อนุมัติเป็นจำนวน",
+            "approve": "อนุมัติ",
+            "approve-progress": "กำลังอนุมัติ...",
+            "approve-swap": "อนุมัติการแลกเปลี่ยนเป็น {{currencyKey}}"
         },
         "unsupported-network": {
             "title": "อุ้ย! คุณอยู่ในเครือข่ายที่ไม่ถูกต้อง!",
@@ -277,7 +282,8 @@
         "race-starts": "เริ่มการแข่งขัน",
         "back": "กลับ",
         "apply-filters": "ใช้ตัวกรอง",
-        "incentivized-market": "ตลาดที่มีแรงจูงใจ"
+        "incentivized-market": "ตลาดที่มีแรงจูงใจ",
+        "number-of-rounds": "จำนวนรอบทั้งหมด"
     },
     "markets": {
         "market-card": {
@@ -306,13 +312,25 @@
                 "passing touchdowns": "การผ่านทัชดาวน์",
                 "passing yards": "ระยะที่ผ่าน",
                 "home runs": "โฮมรัน",
-                "rushing yards": "วิ่งหลา"
+                "rushing yards": "วิ่งหลา",
+                "scoring touchdown": "ใครจะเป็นผู้ทำทัชดาวน์ในเกม?",
+                "field goals made": "ทำประตูในสนามได้",
+                "pitcher hits allowed": "อนุญาตให้ตีเหยือกได้",
+                "points": "คะแนน",
+                "shots": "ช็อต",
+                "goals": "ใครจะเป็นผู้ทำประตูในเกม?",
+                "hits recorded": "บันทึกการเข้าชมแล้ว",
+                "assists": "ช่วยเหลือ",
+                "rebounds": "รีบาวด์",
+                "double double": "ดับเบิ้ลดับเบิ้ล",
+                "triple double": "ทริปเปิ้ล-ดับเบิ้ล"
             },
             "odd-tooltip": {
                 "scoring": {
                     "goals": "goals",
                     "points": "points",
-                    "sets": "ชุด"
+                    "sets": "ชุด",
+                    "rounds": "รอบ"
                 },
                 "match-resolve": {
                     "regular": "in regular time",
@@ -348,7 +366,30 @@
                     "receiving-yards-under": "{{team}} จะมีระยะรับน้อยกว่า {{scoring}}",
                     "receiving-yards-over": "{{team}} จะมีระยะรับมากกว่า {{scoring}}",
                     "rushing-yards-under": "{{team}} จะมีระยะวิ่งน้อยกว่า {{scoring}}",
-                    "passing-yards-under": "{{team}} จะมีระยะส่งบอลน้อยกว่า {{scoring}}"
+                    "passing-yards-under": "{{team}} จะมีระยะส่งบอลน้อยกว่า {{scoring}}",
+                    "touchdowns": "{{team}} จะทำคะแนนทัชดาวน์ในเกม",
+                    "field-goals-made-under": "{{team}} จะมีการยิงประตูน้อยกว่า {{scoring}}",
+                    "field-goals-made-over": "{{team}} จะมีการยิงประตูมากกว่า {{scoring}}",
+                    "info": {
+                        "scoring touchdown": "การรับ การวิ่ง การเตะเตะกลับ ทัชดาวน์การป้องกันและการสกัดกั้นจะถูกนับรวมในผลการแข่งขัน"
+                    },
+                    "pitcher-hits-allowed-under": "{{team}} จะมีโอกาสโจมตีน้อยกว่า {{scoring}}",
+                    "pitcher-hits-allowed-over": "{{team}} จะได้รับอนุญาตให้โจมตีมากกว่า {{scoring}}",
+                    "points-under": "{{team}} จะมีแต้มน้อยกว่า {{scoring}}",
+                    "shots-under": "{{team}} จะมีโอกาสยิงน้อยกว่า {{scoring}}",
+                    "goals": "{{team}} จะทำประตูในเกม",
+                    "shots-over": "{{team}} จะมีโอกาสยิงมากกว่า {{scoring}}",
+                    "points-over": "{{team}} จะมีแต้มมากกว่า {{scoring}}",
+                    "hits-recorded-over": "{{team}} จะมีการบันทึกการเข้าชมมากกว่า {{scoring}}",
+                    "hits-recorded-under": "{{team}} จะมีการบันทึกการเข้าชมน้อยกว่า {{scoring}}",
+                    "rebounds-over": "{{team}} จะมีการรีบาวด์มากกว่า {{scoring}}",
+                    "assists-over": "{{team}} จะมีแอสซิสต์มากกว่า {{scoring}}",
+                    "assists-under": "{{team}} จะมีแอสซิสต์น้อยกว่า {{scoring}}",
+                    "rebounds-under": "{{team}} จะมีการรีบาวด์น้อยกว่า {{scoring}}",
+                    "double-double-yes": "{{team}} จะทำแต้มดับเบิ้ล-ดับเบิ้ล",
+                    "triple-double-yes": "{{team}} จะทำแต้มทริปเปิล-ดับเบิ้ล",
+                    "triple-double-no": "{{team}} จะไม่ทำแต้มทริปเปิล-ดับเบิ้ล",
+                    "double-double-no": "{{team}} จะไม่ทำคะแนนดับเบิ้ล-ดับเบิ้ล"
                 }
             },
             "starts-in": "เริ่มเข้า",
@@ -363,7 +404,8 @@
             "no-win": "ไม่ชนะ",
             "player-props": "อุปกรณ์ประกอบฉากของผู้เล่น",
             "see-more-markets": "ดูตลาดอุปกรณ์ประกอบฉากของผู้เล่น",
-            "see-more-markets-mobile": "อุปกรณ์ประกอบฉากของผู้เล่น"
+            "see-more-markets-mobile": "อุปกรณ์ประกอบฉากของผู้เล่น",
+            "resolved": "แก้ไขแล้ว"
         },
         "market-details": {
             "price": "ราคา",
@@ -408,7 +450,10 @@
                 "max-combined-markets": "จำนวนตลาดรวมสูงสุดในพาร์เลย์คือ {{max}}",
                 "amm-contract-paused": "AMM พาร์เลย์หยุดชั่วคราว",
                 "unique-players": "ไม่สามารถเพิ่มผู้เข้าร่วมคนเดียวกันสองครั้งในพาร์เลย์ {{existingParticipant}} อยู่ในพาร์เลย์แล้ว",
-                "same-event-participant": "รองรับผู้เข้าร่วมเพียงหนึ่งคนต่อเหตุการณ์ ไม่สามารถเพิ่ม {{addedParticipant}} ได้ เนื่องจาก {{existingParticipant}} อยู่ใน Parlay แล้ว"
+                "same-event-participant": "รองรับผู้เข้าร่วมเพียงหนึ่งคนต่อเหตุการณ์ ไม่สามารถเพิ่ม {{addedParticipant}} ได้ เนื่องจาก {{existingParticipant}} อยู่ใน Parlay แล้ว",
+                "already-added-combined-positions": "ไม่สามารถรวมตำแหน่งจากตลาดเดียวกันกับตำแหน่งรวมได้",
+                "same-game-different-player-props": "ไม่รองรับการรวมอุปกรณ์ประกอบฉากของผู้เล่นประเภทต่างๆ",
+                "player-props-and-other-positions": "ไม่รองรับการรวมตำแหน่งอุปกรณ์ประกอบฉากของผู้เล่นกับตำแหน่งอื่นจากตลาดเดียวกัน"
             },
             "skew": "ลาด",
             "payout": "การจ่ายเงิน",
@@ -449,7 +494,10 @@
             "toggle-parlay": {
                 "multi-single": "เดี่ยว",
                 "parlay": "พาร์เลย์"
-            }
+            },
+            "total-to-pay": "ค่าใช้จ่ายทั้งหมด",
+            "in-wallet": "ในกระเป๋าสตางค์",
+            "pay-with-voucher": "ชำระเงินด้วยบัตรกำนัล"
         },
         "nav-menu": {
             "items": {
@@ -607,7 +655,10 @@
             "result": "ผลลัพธ์",
             "position-size": "ขนาดตำแหน่ง",
             "starts": "เริ่ม",
-            "claim-all": "อ้างสิทธิ์ทั้งหมด"
+            "claim-all": "อ้างสิทธิ์ทั้งหมด",
+            "claim-progress": "กำลังอ้างสิทธิ์...",
+            "payout-in": "จ่ายเงินเข้า.",
+            "approve-swap-tooltip": "หากต้องการรับการจ่ายเงินเป็น {{currencyKey}} คุณต้องอนุมัติการแลกเปลี่ยนจาก {{defaultCurrency}} เป็น {{currencyKey}}"
         },
         "messages": {
             "no-open": "คุณไม่มีตำแหน่งที่เปิดอยู่",
@@ -828,7 +879,8 @@
             "period-end-label": "The period ends in",
             "period-ended-label": "Period ended",
             "bi-weekly-period": "Bi-weekly period"
-        }
+        },
+        "warning2": "ผู้ใช้ที่ได้ครอบคลุม 50% หรือมากกว่าของการผสมผสานที่เป็นไปได้ของตั๋วที่ชนะจะถูกตัดสิทธิ์"
     },
     "wizard": {
         "title": "Get Started!",
@@ -955,5 +1007,39 @@
         "parlay-lp": "หจก.พาร์เลย์",
         "single-lp": "หจก.เดียว",
         "description-parlay": "<h1>คำอธิบาย</h1><p> การจัดหาสภาพคล่องนั้นเกี่ยวข้องกับผู้ใช้ที่ฝากหลักประกัน Stablecoin ไว้ในกลุ่มสภาพคล่องตามสัญญาอัจฉริยะสำหรับการซื้อขายล่วงเวลา หลักประกันที่ฝากไว้ใช้เพื่ออำนวยความสะดวกในการซื้อขาย Parlay AMM ของค่าล่วงเวลา</p><p> เพื่อให้สามารถจัดหาสภาพคล่องได้ คุณจะต้องเดิมพันกับ THALES ไม่มีขีดจำกัดสูงสุดต่อกระเป๋าเงินหนึ่งใบ และคุณสามารถฝากได้สูงสุด 1 {{currency}} ต่อ {{thalesStakedAmount}} THALES ที่เดิมพันไปจนกว่าสภาพคล่องจะเต็ม</p><p> เมื่อสิ้นสุดแต่ละรอบ ส่วนแบ่งตามสัดส่วนของ PnL ของรอบนั้นจะถูกเพิ่มไปยังยอดเงินฝากของคุณ</p><p> หากคุณต้องการถอน คุณสามารถส่งสัญญาณได้ตลอดเวลาในระหว่างรอบที่กำลังดำเนินอยู่ และเมื่อสิ้นสุดรอบ จำนวนเงินที่คุณส่งสัญญาณให้ถอน (รวมถึง PnL ของรอบนั้น) จะถูกส่งถึงคุณ จำนวนเงินขั้นต่ำที่จะถอนถูกกำหนดไว้ที่ 10%</p><p> หากคุณตัดสินใจที่จะถอนเงินเดิมพันของ THALES ในขณะที่ให้สภาพคล่อง โปรดทราบว่าคุณจะต้องส่งสัญญาณการถอนออกจากกลุ่มสภาพคล่องก่อน</p><p> การจัดหาสภาพคล่องทำให้คุณมีความเสี่ยงต่างๆ รวมถึงการสูญเสียที่อาจเกิดขึ้นจากการที่ผู้ใช้ชนะในการซื้อขาย เช่นเดียวกับความเสี่ยงด้านความปลอดภัยของสัญญาอัจฉริยะ โปรดแน่ใจว่าคุณเข้าใจความเสี่ยงเหล่านี้ก่อนฝากเงิน</p><p><tipLink> TIP-142</tipLink> มีรายละเอียดเพิ่มเติมเกี่ยวกับการดำเนินการทางเทคนิคของการจัดหาสภาพคล่องล่วงเวลา</p>"
+    },
+    "seo": {
+        "home": {
+            "title": "ตลาดต่อเวลา: Premier Web3 Sportsbook",
+            "description": "เข้าสู่โลกของสปอร์ตบุ๊คออนไลน์ web3 ชั้นนำ รักษาตำแหน่งในกีฬา 12+ รายการและลีก 40+ รายการ"
+        },
+        "markets": {
+            "description": "เข้าร่วมเว็บสปอร์ตบุ๊ค web3 ที่ดีที่สุดในตลาด รักษาตำแหน่งในลีกชั้นนำเช่น NFL, NBA, UCL, EPL และอีกมากมาย",
+            "title": "ตลาดต่อเวลา: ตลาดหนังสือกีฬา Web3 สำหรับลีกมากกว่า 40 ลีก"
+        },
+        "vaults": {
+            "title": "ห้องนิรภัยตลาดล่วงเวลา: การซื้อขายอัตโนมัติ",
+            "description": "ฝากสินทรัพย์ไว้ในห้องนิรภัยของตลาดล่วงเวลา และปล่อยให้กลไกการซื้อขายอัตโนมัติของเราปรับใช้กลยุทธ์ที่คุณเลือก"
+        },
+        "parlay-leaderboard": {
+            "title": "ตลาดต่อเวลา: รับรางวัลพาร์เลย์ทุกๆ 2 สัปดาห์",
+            "description": "ตลาดล่วงเวลาเป็นเว็บสปอร์ตบุ๊ค web3 ที่มีโบนัสรายปักษ์ที่ดีที่สุดในตลาดสำหรับผู้เล่นพาร์เลย์! ตรวจสอบกระดานผู้นำและหากคุณผ่านเข้ารอบที่นี่"
+        },
+        "referral": {
+            "title": "ตลาดล่วงเวลา: รับค่าธรรมเนียมการอ้างอิง",
+            "description": "แนะนำเพื่อนไปที่ตลาดล่วงเวลาและรับเปอร์เซ็นต์จากการซื้อขายแต่ละครั้งของบุคคลที่คุณแนะนำ จ่ายเป็นเงินประกัน USD ทันทีและเข้ากระเป๋าเงินของคุณโดยตรง"
+        },
+        "profile": {
+            "title": "ตลาดล่วงเวลา: โปรไฟล์ผู้ใช้",
+            "description": "รับเงินรางวัลของคุณ ตรวจสอบผลงานของคุณ และติดตามเงินฝากที่คุณได้ทำไว้กับห้องนิรภัยตลาดล่วงเวลา"
+        },
+        "liquidity-pool": {
+            "title": "ตลาดล่วงเวลา: มาเป็นบ้านด้วยแหล่งรวมสภาพคล่องของเรา",
+            "description": "เป็นบ้านตลาดล่วงเวลา! ฝากหลักประกัน Stablecoin ลงในแหล่งรวมสภาพคล่องเพื่อโอกาสรับเปอร์เซ็นต์ของ PnL ทุกสัปดาห์"
+        },
+        "single-market": {
+            "description": "{{dynamicTitle}}: เพลิดเพลินกับอัตราต่อรองเว็บ3 สปอร์ตบุ๊คที่ดีที่สุดในตลาด ไม่จำเป็นต้องลงทะเบียน ตลาดกีฬาที่มีการกระจายอำนาจอย่างเต็มที่",
+            "title": "ตลาดต่อเวลา Web3 Sportsbook: {{dynamicTitle}}"
+        }
     }
 }

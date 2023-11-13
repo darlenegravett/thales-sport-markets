@@ -5,7 +5,7 @@ export const TAGS_LIST: Tags = [
     {
         id: 9001,
         label: 'NCAA Football',
-        logo: `/logos/leagueLogos/ncaa.png`,
+        logo: `/logos/leagueLogos/ncaa.webp`,
         logoClass: 'icon-league league--ncaa',
         favourite: false,
         hidden: false,
@@ -14,7 +14,7 @@ export const TAGS_LIST: Tags = [
     {
         id: 9002,
         label: 'NFL',
-        logo: `/logos/leagueLogos/nfl.png`,
+        logo: `/logos/leagueLogos/nfl.webp`,
         logoClass: 'icon-league league--nfl',
         favourite: false,
         hidden: false,
@@ -23,7 +23,7 @@ export const TAGS_LIST: Tags = [
     {
         id: 9003,
         label: 'MLB',
-        logo: `/logos/leagueLogos/mlb.svg`,
+        logo: `/logos/leagueLogos/mlb.webp`,
         logoClass: 'icon-league league--mlb',
         favourite: false,
         hidden: false,
@@ -32,7 +32,7 @@ export const TAGS_LIST: Tags = [
     {
         id: 9004,
         label: 'NBA',
-        logo: `/logos/leagueLogos/nba.svg`,
+        logo: `/logos/leagueLogos/nba.webp`,
         logoClass: 'icon-league league--nba',
         favourite: false,
         hidden: false,
@@ -49,7 +49,7 @@ export const TAGS_LIST: Tags = [
     {
         id: 9006,
         label: 'NHL',
-        logo: `/logos/leagueLogos/nhl.png`,
+        logo: `/logos/leagueLogos/nhl.webp`,
         logoClass: 'icon-league league--nhl',
         favourite: false,
         hidden: false,
@@ -58,7 +58,7 @@ export const TAGS_LIST: Tags = [
     {
         id: 9007,
         label: 'UFC',
-        logo: '/logos/ufc-logo.png',
+        logo: '/logos/leagueLogos/ufc.webp',
         logoClass: 'icon-league league--ufc',
         favourite: false,
         hidden: false,
@@ -68,7 +68,7 @@ export const TAGS_LIST: Tags = [
     {
         id: 9010,
         label: 'MLS',
-        logo: `/logos/leagueLogos/mls.png`,
+        logo: `/logos/leagueLogos/mls.webp`,
         logoClass: 'icon-league league--mls',
         favourite: false,
         hidden: false,
@@ -77,7 +77,7 @@ export const TAGS_LIST: Tags = [
     {
         id: 9011,
         label: 'EPL',
-        logo: `/logos/leagueLogos/EPL.png`,
+        logo: `/logos/leagueLogos/EPL.webp`,
         logoClass: 'icon-league league--epl',
         favourite: false,
         hidden: false,
@@ -86,7 +86,7 @@ export const TAGS_LIST: Tags = [
     {
         id: 9012,
         label: 'Ligue 1',
-        logo: `/logos/leagueLogos/Ligue1.png`,
+        logo: `/logos/leagueLogos/Ligue1.webp`,
         logoClass: 'icon-league league--ligue1',
         favourite: false,
         hidden: false,
@@ -95,7 +95,7 @@ export const TAGS_LIST: Tags = [
     {
         id: 9013,
         label: 'Bundesliga',
-        logo: '/logos/leagueLogos/bundesliga.png',
+        logo: '/logos/leagueLogos/bundesliga.webp',
         logoClass: 'icon-league league--bundesliga',
         favourite: false,
         hidden: false,
@@ -104,7 +104,7 @@ export const TAGS_LIST: Tags = [
     {
         id: 9014,
         label: 'La Liga',
-        logo: `/logos/leagueLogos/LaLiga.png`,
+        logo: `/logos/leagueLogos/LaLiga.webp`,
         logoClass: 'icon-league league--la-liga',
         favourite: false,
         hidden: false,
@@ -113,7 +113,7 @@ export const TAGS_LIST: Tags = [
     {
         id: 9015,
         label: 'Serie A',
-        logo: `/logos/leagueLogos/seriea.png`,
+        logo: `/logos/leagueLogos/seriea.webp`,
         logoClass: 'icon-league league--serie-a',
         favourite: false,
         hidden: false,
@@ -122,7 +122,7 @@ export const TAGS_LIST: Tags = [
     {
         id: 9016,
         label: 'UEFA Champions League',
-        logo: `/logos/leagueLogos/ucl-white.png`,
+        logo: `/logos/leagueLogos/ucl-white.webp`,
         logoClass: 'icon-league league--ucl',
         favourite: false,
         hidden: false,
@@ -134,7 +134,7 @@ export const TAGS_LIST: Tags = [
         logo: ``,
         logoClass: 'icon-league league--uel',
         favourite: false,
-        hidden: true,
+        hidden: false,
         priority: 111,
     },
     {
@@ -155,24 +155,24 @@ export const TAGS_LIST: Tags = [
         hidden: false,
         priority: 109,
     },
-    {
-        id: 9445,
-        label: 'Formula 1',
-        logo: '/logos/leagueLogos/f1.png',
-        logoClass: 'icon-league league--f1',
-        favourite: false,
-        hidden: false,
-        priority: 701,
-    },
-    {
-        id: 9497,
-        label: 'MotoGP',
-        logo: `/logos/leagueLogos/motogp.png`,
-        logoClass: 'icon-league league--motogp',
-        favourite: false,
-        hidden: false,
-        priority: 702,
-    },
+    // {
+    //     id: 9445,
+    //     label: 'Formula 1',
+    //     logo: '/logos/leagueLogos/f1.webp',
+    //     logoClass: 'icon-league league--f1',
+    //     favourite: false,
+    //     hidden: false,
+    //     priority: 701,
+    // },
+    // {
+    //     id: 9497,
+    //     label: 'MotoGP',
+    //     logo: `/logos/leagueLogos/motogp.webp`,
+    //     logoClass: 'icon-league league--motogp',
+    //     favourite: false,
+    //     hidden: false,
+    //     priority: 702,
+    // },
     {
         id: 9153,
         label: 'Grand Slam',
@@ -364,7 +364,7 @@ export const TAGS_LIST: Tags = [
         label: 'UEFA Europa League',
         logoClass: 'icon-league league--uel',
         favourite: false,
-        hidden: false,
+        hidden: true,
         priority: 117,
     },
     {
@@ -390,6 +390,14 @@ export const TAGS_LIST: Tags = [
         favourite: false,
         hidden: false,
         priority: 109,
+    },
+    {
+        id: 19199,
+        label: 'CONMEBOL WC Qualification',
+        logoClass: '',
+        favourite: false,
+        hidden: false,
+        priority: 110,
     },
 ];
 
@@ -441,6 +449,7 @@ export const SPORTS_MAP: SportsMap = {
     9409: 'Basketball',
     9536: 'Soccer',
     9268: 'Soccer',
+    19199: 'Soccer',
 };
 
 export const TAGS_OF_MARKETS_WITHOUT_DRAW_ODDS = [
@@ -498,6 +507,7 @@ export const SPORTS_TAGS_MAP: SportsTagsMap = {
         9073,
         9536,
         9268,
+        19199,
     ],
     MMA: [9007, 18196],
     Motosport: [9445, 9497],
@@ -533,6 +543,7 @@ export const ENETPULSE_SPORTS = [
     9409,
     9536,
     9268,
+    19199,
 ];
 
 export const JSON_ODDS_SPORTS = [109021, 109121];
@@ -544,6 +555,8 @@ export const UEFA_TAGS = [9016, 9017, 18806, 18821, 9288, 9042, 19216, 9076, 907
 export const MOTOSPORT_TAGS = [9445, 9497];
 export const GOLF_TAGS = [109021, 109121];
 export const GOLF_TOURNAMENT_WINNER_TAG = 109121;
+export const EUROPA_LEAGUE_TAGS = [9017, 9073];
+export const INTERNATIONAL_SPORTS = [18821, 19199, 9409, 9033, 9050, 9288, 18806, 9018, 9296, 9076];
 
 export const BetTypeNameMap: Record<BetType, string> = {
     [BetType.WINNER]: 'winner',
@@ -556,6 +569,41 @@ export const BetTypeNameMap: Record<BetType, string> = {
     [BetType.PLAYER_PROPS_PASSING_TOUCHDOWNS]: 'passing touchdowns',
     [BetType.PLAYER_PROPS_RUSHING_YARDS]: 'rushing yards',
     [BetType.PLAYER_PROPS_RECEIVING_YARDS]: 'receiving yards',
+    [BetType.PLAYER_PROPS_TOUCHDOWNS]: 'scoring touchdown',
+    [BetType.PLAYER_PROPS_FIELD_GOALS_MADE]: 'field goals made',
+    [BetType.PLAYER_PROPS_PITCHER_HITS_ALLOWED]: 'pitcher hits allowed',
+    [BetType.PLAYER_PROPS_POINTS]: 'points',
+    [BetType.PLAYER_PROPS_SHOTS]: 'shots',
+    [BetType.PLAYER_PROPS_GOALS]: 'goals',
+    [BetType.PLAYER_PROPS_HITS_RECORDED]: 'hits recorded',
+    [BetType.PLAYER_PROPS_REBOUNDS]: 'rebounds',
+    [BetType.PLAYER_PROPS_ASSISTS]: 'assists',
+    [BetType.PLAYER_PROPS_DOUBLE_DOUBLE]: 'double double',
+    [BetType.PLAYER_PROPS_TRIPLE_DOUBLE]: 'triple double',
+};
+
+export const BetTypeTitleMap: Record<BetType, string> = {
+    [BetType.PLAYER_PROPS_TOUCHDOWNS]: 'Who will score a touchdown in the game?',
+    [BetType.PLAYER_PROPS_GOALS]: 'Who will score a goal in the game',
+    [BetType.WINNER]: '',
+    [BetType.SPREAD]: '',
+    [BetType.TOTAL]: '',
+    [BetType.DOUBLE_CHANCE]: '',
+    [BetType.PLAYER_PROPS_HOMERUNS]: '',
+    [BetType.PLAYER_PROPS_STRIKEOUTS]: '',
+    [BetType.PLAYER_PROPS_PASSING_YARDS]: '',
+    [BetType.PLAYER_PROPS_PASSING_TOUCHDOWNS]: '',
+    [BetType.PLAYER_PROPS_RUSHING_YARDS]: '',
+    [BetType.PLAYER_PROPS_RECEIVING_YARDS]: '',
+    [BetType.PLAYER_PROPS_FIELD_GOALS_MADE]: '',
+    [BetType.PLAYER_PROPS_PITCHER_HITS_ALLOWED]: '',
+    [BetType.PLAYER_PROPS_POINTS]: '',
+    [BetType.PLAYER_PROPS_SHOTS]: '',
+    [BetType.PLAYER_PROPS_HITS_RECORDED]: '',
+    [BetType.PLAYER_PROPS_REBOUNDS]: '',
+    [BetType.PLAYER_PROPS_ASSISTS]: '',
+    [BetType.PLAYER_PROPS_DOUBLE_DOUBLE]: '',
+    [BetType.PLAYER_PROPS_TRIPLE_DOUBLE]: '',
 };
 
 export const SCORING_MAP: SportsMap = {
@@ -565,7 +613,7 @@ export const SCORING_MAP: SportsMap = {
     9004: 'points',
     9005: 'points',
     9006: 'goals',
-    9007: '',
+    9007: 'rounds',
     9008: 'points',
     9010: 'goals',
     9011: 'goals',
@@ -586,7 +634,7 @@ export const SCORING_MAP: SportsMap = {
     19138: 'round',
     9020: 'points',
     9399: 'points',
-    18196: '',
+    18196: 'rounds',
     9057: 'goals',
     9061: 'goals',
     9045: 'goals',
@@ -606,6 +654,7 @@ export const SCORING_MAP: SportsMap = {
     9409: 'points',
     9536: 'goals',
     9268: 'goals',
+    19199: 'goals',
 };
 
 export const MATCH_RESOLVE_MAP: SportsMap = {
@@ -656,6 +705,7 @@ export const MATCH_RESOLVE_MAP: SportsMap = {
     9409: 'overtime',
     9536: 'regular',
     9268: 'regular',
+    19199: 'regular',
 };
 
 export const SPORT_PERIODS_MAP: SportsMap = {
@@ -704,4 +754,5 @@ export const SPORT_PERIODS_MAP: SportsMap = {
     9409: 'quarter',
     9536: 'half',
     9268: 'half',
+    19199: 'half',
 };

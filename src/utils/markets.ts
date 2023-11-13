@@ -5,6 +5,7 @@ import {
     GOLF_TAGS,
     GOLF_TOURNAMENT_WINNER_TAG,
     IIHF_WC_TAG,
+    INTERNATIONAL_SPORTS,
     MATCH_RESOLVE_MAP,
     MOTOSPORT_TAGS,
     SCORING_MAP,
@@ -25,10 +26,17 @@ import {
     PositionData,
     SportMarketInfo,
 } from 'types/markets';
-import { addDaysToEnteredTimestamp } from './formatters/date';
-import { formatCurrency } from './formatters/number';
+import { addDaysToEnteredTimestamp, formatCurrency } from 'thales-utils';
 import { fixOneSideMarketCompetitorName } from './formatters/string';
-import { BetType, DoubleChanceMarketType, OddsType, PLAYER_PROPS_BET_TYPES, Position } from 'enums/markets';
+import {
+    BetType,
+    DoubleChanceMarketType,
+    ONE_SIDER_PLAYER_PROPS_BET_TYPES,
+    OddsType,
+    PLAYER_PROPS_BET_TYPES,
+    Position,
+    SPECIAL_YES_NO_BET_TYPES,
+} from 'enums/markets';
 import { PARLAY_MAXIMUM_QUOTE } from '../constants/markets';
 
 const EXPIRE_SINGLE_SPORT_MARKET_PERIOD_IN_DAYS = 90;
@@ -47,18 +55,22 @@ export const getSymbolText = (
     market: SportMarketInfo | MarketData,
     combinedMarketPositionSymbol?: CombinedMarketsPositionName
 ) => {
+    const betType = Number(market.betType);
     if (combinedMarketPositionSymbol) {
         return combinedMarketPositionSymbol;
     }
 
-    if (market.isOneSideMarket) {
+    if (market.isOneSideMarket || isOneSidePlayerProps(Number(betType))) {
         return 'YES';
     }
 
-    if (market.betType === BetType.SPREAD) return 'H' + (position === Position.HOME ? '1' : '2');
-    if (market.betType === BetType.TOTAL || isPlayerProps(market.betType))
-        return position === Position.HOME ? 'O' : 'U';
-    if (market.betType === BetType.DOUBLE_CHANCE)
+    if (isSpecialYesNoProp(Number(betType))) {
+        return position === Position.HOME ? 'YES' : 'NO';
+    }
+
+    if (betType === BetType.SPREAD) return 'H' + (position === Position.HOME ? '1' : '2');
+    if (betType === BetType.TOTAL || isPlayerProps(betType)) return position === Position.HOME ? 'O' : 'U';
+    if (betType === BetType.DOUBLE_CHANCE)
         switch (market.doubleChanceMarketType) {
             case DoubleChanceMarketType.HOME_TEAM_NOT_TO_LOSE:
                 return '1X';
@@ -193,6 +205,8 @@ export const isIIHFWCGame = (tag: number) => Number(tag) === IIHF_WC_TAG;
 
 export const isUEFAGame = (tag: number) => UEFA_TAGS.includes(tag);
 
+export const isInternationalGame = (tag: number) => INTERNATIONAL_SPORTS.includes(tag);
+
 export const isMotosport = (tag: number) => MOTOSPORT_TAGS.includes(tag);
 
 export const isGolf = (tag: number) => GOLF_TAGS.includes(tag);
@@ -245,20 +259,22 @@ export const updateTotalQuoteAndAmountFromContract = (
         let totalAmount = parlay.totalAmount;
 
         let realQuote = 1;
-        parlay.marketQuotes.map((quote) => {
-            realQuote = realQuote * quote;
-        });
+        if (parlay.marketQuotes) {
+            parlay.marketQuotes.map((quote) => {
+                realQuote = realQuote * quote;
+            });
 
-        parlay.sportMarketsFromContract.forEach((address, index) => {
-            const market = parlay.sportMarkets.find((market) => market.address === address);
+            parlay.sportMarketsFromContract.forEach((address, index) => {
+                const market = parlay.sportMarkets.find((market) => market.address === address);
 
-            if (market && market.isCanceled) {
-                realQuote = realQuote / parlay.marketQuotes[index];
-                const maximumQuote = PARLAY_MAXIMUM_QUOTE;
-                totalQuote = realQuote < maximumQuote ? maximumQuote : realQuote;
-                totalAmount = totalAmount * parlay.marketQuotes[index];
-            }
-        });
+                if (market && market.isCanceled) {
+                    realQuote = realQuote / parlay.marketQuotes[index];
+                    const maximumQuote = PARLAY_MAXIMUM_QUOTE;
+                    totalQuote = realQuote < maximumQuote ? maximumQuote : realQuote;
+                    totalAmount = totalAmount * parlay.marketQuotes[index];
+                }
+            });
+        }
 
         return {
             ...parlay,
@@ -347,6 +363,39 @@ export const getOddTooltipText = (position: Position, market: SportMarketInfo | 
                 case BetType.PLAYER_PROPS_PASSING_TOUCHDOWNS:
                     translationKey = 'player-props.passing-touchdowns-over';
                     break;
+                case BetType.PLAYER_PROPS_TOUCHDOWNS:
+                    translationKey = 'player-props.touchdowns';
+                    break;
+                case BetType.PLAYER_PROPS_FIELD_GOALS_MADE:
+                    translationKey = 'player-props.field-goals-made-over';
+                    break;
+                case BetType.PLAYER_PROPS_PITCHER_HITS_ALLOWED:
+                    translationKey = 'player-props.pitcher-hits-allowed-over';
+                    break;
+                case BetType.PLAYER_PROPS_POINTS:
+                    translationKey = 'player-props.points-over';
+                    break;
+                case BetType.PLAYER_PROPS_SHOTS:
+                    translationKey = 'player-props.shots-over';
+                    break;
+                case BetType.PLAYER_PROPS_GOALS:
+                    translationKey = 'player-props.goals';
+                    break;
+                case BetType.PLAYER_PROPS_HITS_RECORDED:
+                    translationKey = 'player-props.hits-recorded-over';
+                    break;
+                case BetType.PLAYER_PROPS_REBOUNDS:
+                    translationKey = 'player-props.rebounds-over';
+                    break;
+                case BetType.PLAYER_PROPS_ASSISTS:
+                    translationKey = 'player-props.assists-over';
+                    break;
+                case BetType.PLAYER_PROPS_DOUBLE_DOUBLE:
+                    translationKey = 'player-props.double-double-yes';
+                    break;
+                case BetType.PLAYER_PROPS_TRIPLE_DOUBLE:
+                    translationKey = 'player-props.triple-double-yes';
+                    break;
                 default:
                     translationKey = market.isOneSideMarket
                         ? Number(market.tags[0]) == GOLF_TOURNAMENT_WINNER_TAG
@@ -381,6 +430,33 @@ export const getOddTooltipText = (position: Position, market: SportMarketInfo | 
                 case BetType.PLAYER_PROPS_PASSING_TOUCHDOWNS:
                     translationKey = 'player-props.passing-touchdowns-under';
                     break;
+                case BetType.PLAYER_PROPS_FIELD_GOALS_MADE:
+                    translationKey = 'player-props.field-goals-made-under';
+                    break;
+                case BetType.PLAYER_PROPS_PITCHER_HITS_ALLOWED:
+                    translationKey = 'player-props.pitcher-hits-allowed-under';
+                    break;
+                case BetType.PLAYER_PROPS_POINTS:
+                    translationKey = 'player-props.points-under';
+                    break;
+                case BetType.PLAYER_PROPS_SHOTS:
+                    translationKey = 'player-props.shots-under';
+                    break;
+                case BetType.PLAYER_PROPS_HITS_RECORDED:
+                    translationKey = 'player-props.hits-recorded-under';
+                    break;
+                case BetType.PLAYER_PROPS_REBOUNDS:
+                    translationKey = 'player-props.rebounds-under';
+                    break;
+                case BetType.PLAYER_PROPS_ASSISTS:
+                    translationKey = 'player-props.assists-under';
+                    break;
+                case BetType.PLAYER_PROPS_DOUBLE_DOUBLE:
+                    translationKey = 'player-props.double-double-no';
+                    break;
+                case BetType.PLAYER_PROPS_TRIPLE_DOUBLE:
+                    translationKey = 'player-props.triple-double-no';
+                    break;
                 default:
                     translationKey = market.isOneSideMarket
                         ? Number(market.tags[0]) == GOLF_TOURNAMENT_WINNER_TAG
@@ -393,6 +469,7 @@ export const getOddTooltipText = (position: Position, market: SportMarketInfo | 
             translationKey = 'draw';
             break;
     }
+
     return i18n.t(`markets.market-card.odd-tooltip.${translationKey}`, {
         team: market.playerName === null ? team : market.playerName,
         team2,
@@ -516,7 +593,7 @@ export const syncPositionsAndMarketsPerContractOrderInParlay = (parlayMarket: Pa
             positions.push(position);
             markets.push(market);
 
-            const quote = market.isCanceled ? 1 : parlayMarket.marketQuotes[index];
+            const quote = market.isCanceled || !parlayMarket.marketQuotes ? 1 : parlayMarket.marketQuotes[index];
             quotes.push(quote);
         }
     });
@@ -573,4 +650,16 @@ export const canPlayerBeAddedToParlay = (parlayPositions: ParlaysMarketPosition[
 
 export const isPlayerProps = (betType: BetType) => {
     return PLAYER_PROPS_BET_TYPES.includes(betType);
+};
+
+export const isOneSidePlayerProps = (betType: BetType) => {
+    return ONE_SIDER_PLAYER_PROPS_BET_TYPES.includes(betType);
+};
+
+export const isSpecialYesNoProp = (betType: BetType) => {
+    return SPECIAL_YES_NO_BET_TYPES.includes(betType);
+};
+
+export const fixPlayerPropsLinesFromContract = (market: SportMarketInfo | MarketData) => {
+    Number(market.playerPropsLine) % 1 == 0 ? (market.playerPropsLine = Number(market.playerPropsLine) / 100) : '';
 };

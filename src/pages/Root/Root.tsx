@@ -29,6 +29,7 @@ import { Network } from 'enums/network';
 import { ThemeMap } from 'constants/ui';
 import { getDefaultTheme } from 'redux/modules/ui';
 import { base } from 'constants/network';
+import { PLAUSIBLE } from 'constants/analytics';
 
 dotenv.config();
 
@@ -49,7 +50,7 @@ const CHAIN_TO_RPC_PROVIDER_NETWORK_NAME: Record<number, RpcProvider> = {
         blast: 'optimism-mainnet',
     },
     [Network.OptimismGoerli]: { ankr: 'optimism_testnet', chainnode: 'optimism-goerli', blast: 'optimism-goerli' },
-    [Network.ArbitrumOne]: { ankr: 'arbitrum', chainnode: 'arbitrum-one', blast: 'arbitrum-one' },
+    [Network.Arbitrum]: { ankr: 'arbitrum', chainnode: 'arbitrum-one', blast: 'arbitrum-one' },
     [Network.Base]: { ankr: 'base', chainnode: '', blast: '' },
 };
 
@@ -129,6 +130,8 @@ const theme = getDefaultTheme();
 const customTheme = merge(darkTheme(), { colors: { modalBackground: ThemeMap[theme].background.primary } });
 
 const Root: React.FC<RootProps> = ({ store }) => {
+    PLAUSIBLE.enableAutoPageviews();
+
     return (
         <Provider store={store}>
             <MatomoProvider value={instance}>

@@ -2,9 +2,8 @@ import { useQuery, UseQueryOptions } from 'react-query';
 import QUERY_KEYS from 'constants/queryKeys';
 import { ParlayAmmData } from 'types/markets';
 import networkConnector from 'utils/networkConnector';
-import { bigNumberFormmaterWithDecimals } from 'utils/formatters/ethers';
+import { bigNumberFormatter, getDefaultDecimalsForNetwork } from 'thales-utils';
 import { Network } from 'enums/network';
-import { getDefaultDecimalsForNetwork } from 'utils/network';
 
 const useParlayAmmDataQuery = (networkId: Network, options?: UseQueryOptions<ParlayAmmData | undefined>) => {
     return useQuery<ParlayAmmData | undefined>(
@@ -24,16 +23,14 @@ const useParlayAmmDataQuery = (networkId: Network, options?: UseQueryOptions<Par
                 if (parlayMarketDataContract) {
                     const parlayAMMParameters = await parlayMarketDataContract.getParlayAMMParameters();
 
-                    parlayData.minUsdAmount = bigNumberFormmaterWithDecimals(
+                    parlayData.minUsdAmount = bigNumberFormatter(
                         parlayAMMParameters.minUSDAmount,
                         getDefaultDecimalsForNetwork(networkId)
                     );
-                    parlayData.maxSupportedAmount = bigNumberFormmaterWithDecimals(
-                        parlayAMMParameters.maxSupportedAmount
-                    );
-                    parlayData.maxSupportedOdds = bigNumberFormmaterWithDecimals(parlayAMMParameters.maxSupportedOdds);
-                    parlayData.parlayAmmFee = bigNumberFormmaterWithDecimals(parlayAMMParameters.parlayAmmFee);
-                    parlayData.safeBoxImpact = bigNumberFormmaterWithDecimals(parlayAMMParameters.safeBoxImpact);
+                    parlayData.maxSupportedAmount = bigNumberFormatter(parlayAMMParameters.maxSupportedAmount);
+                    parlayData.maxSupportedOdds = bigNumberFormatter(parlayAMMParameters.maxSupportedOdds);
+                    parlayData.parlayAmmFee = bigNumberFormatter(parlayAMMParameters.parlayAmmFee);
+                    parlayData.safeBoxImpact = bigNumberFormatter(parlayAMMParameters.safeBoxImpact);
                     parlayData.parlaySize = Number(parlayAMMParameters.parlaySize);
                 }
 

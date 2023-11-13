@@ -1,16 +1,13 @@
-import { STABLE_DECIMALS } from 'constants/currency';
 import { DEFAULT_NETWORK, SUPPORTED_NETWORKS, SUPPORTED_NETWORKS_PARAMS } from 'constants/network';
 import { BigNumber } from 'ethers';
 import { Network } from 'enums/network';
 import { getNavItemFromRoute } from './ui';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
-import localStore from './localStore';
+import { localStore } from 'thales-utils';
+import { SupportedNetwork } from '../types/network';
 import { getCollaterals } from './collaterals';
-import { NetworkParams } from '../types/network';
 
-export const hasEthereumInjected = () => !!window.ethereum;
-
-export const isNetworkSupported = (networkId: Network): boolean => {
+export const isNetworkSupported = (networkId: SupportedNetwork): boolean => {
     return !!SUPPORTED_NETWORKS[networkId];
 };
 
@@ -35,11 +32,6 @@ export const getNetworkNameByNetworkId = (networkId: Network, shortName = false)
     return shortName ? network?.shortChainName : network?.chainName;
 };
 
-export const getDefaultDecimalsForNetwork = (networkId: Network) => {
-    if (networkId == Network.ArbitrumOne || networkId === Network.Base) return STABLE_DECIMALS.USDC;
-    return STABLE_DECIMALS.sUSD;
-};
-
 export const getDefaultNetworkName = (shortName = false): string => {
     // find should always return Object for default network ID
     const network = SUPPORTED_NETWORKS_PARAMS[DEFAULT_NETWORK.networkId];
@@ -57,41 +49,12 @@ export const isRouteAvailableForNetwork = (route: string, networkId: Network): b
     return false;
 };
 
-export const getDefaultCollateralIndexForNetworkId = (networkId: Network): number => {
-    const lsSelectedStableIndex = localStore.get(LOCAL_STORAGE_KEYS.STABLE_INDEX);
-    return networkId === Network.ArbitrumOne ? 0 : (lsSelectedStableIndex as number) || 0;
+export const getDefaultCollateralIndexForNetworkId = (networkId: SupportedNetwork): number => {
+    const lsSelectedCollateralIndex = localStore.get(`${LOCAL_STORAGE_KEYS.COLLATERAL_INDEX}${networkId}`);
+    return lsSelectedCollateralIndex && getCollaterals(networkId).length > Number(lsSelectedCollateralIndex)
+        ? Number(lsSelectedCollateralIndex)
+        : 0;
 };
 
-export const isMultiCollateralSupportedForNetwork = (networkId: Network) => getCollaterals(networkId).length > 1;
-
-export const changeNetwork = async (network: NetworkParams, callback?: VoidFunction): Promise<void> => {
-    if (hasEthereumInjected()) {
-        try {
-            await (window.ethereum as any).request({
-                method: 'wallet_switchEthereumChain',
-                params: [{ chainId: network.chainId }],
-            });
-            callback && callback();
-        } catch (switchError: any) {
-            if (network && switchError.code === 4902) {
-                try {
-                    await (window.ethereum as any).request({
-                        method: 'wallet_addEthereumChain',
-                        params: [network],
-                    });
-                    await (window.ethereum as any).request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: network.chainId }],
-                    });
-                    callback && callback();
-                } catch (addError) {
-                    console.log(addError);
-                }
-            } else {
-                console.log(switchError);
-            }
-        }
-    } else {
-        callback && callback();
-    }
-};
+export const getIsMultiCollateralSupported = (networkId: SupportedNetwork): boolean =>
+    getCollaterals(networkId).length > 1;

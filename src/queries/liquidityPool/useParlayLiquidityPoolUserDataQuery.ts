@@ -1,10 +1,9 @@
 import { useQuery, UseQueryOptions } from 'react-query';
 import QUERY_KEYS from '../../constants/queryKeys';
-import { bigNumberFormmaterWithDecimals, bigNumberFormatter } from 'utils/formatters/ethers';
+import { bigNumberFormatter, getDefaultDecimalsForNetwork } from 'thales-utils';
 import networkConnector from 'utils/networkConnector';
 import { Network } from 'enums/network';
 import { UserLiquidityPoolData } from 'types/liquidityPool';
-import { getDefaultDecimalsForNetwork } from 'utils/network';
 
 const useParlayLiquidityPoolUserDataQuery = (
     walletAddress: string,
@@ -39,16 +38,16 @@ const useParlayLiquidityPoolUserDataQuery = (
                     );
 
                     userLiquidityPoolData.isWithdrawalRequested = contractUserLiquidityPoolData.withdrawalRequested;
-                    userLiquidityPoolData.withdrawalShare = bigNumberFormmaterWithDecimals(
+                    userLiquidityPoolData.withdrawalShare = bigNumberFormatter(
                         contractUserLiquidityPoolData.withdrawalShare
                     );
                     userLiquidityPoolData.isPartialWithdrawalRequested = userLiquidityPoolData.withdrawalShare > 0;
 
-                    userLiquidityPoolData.balanceCurrentRound = bigNumberFormmaterWithDecimals(
+                    userLiquidityPoolData.balanceCurrentRound = bigNumberFormatter(
                         contractUserLiquidityPoolData.balanceCurrentRound,
                         decimals
                     );
-                    userLiquidityPoolData.balanceNextRound = bigNumberFormmaterWithDecimals(
+                    userLiquidityPoolData.balanceNextRound = bigNumberFormatter(
                         contractUserLiquidityPoolData.balanceNextRound,
                         decimals
                     );
@@ -65,12 +64,12 @@ const useParlayLiquidityPoolUserDataQuery = (
 
                     userLiquidityPoolData.hasDepositForCurrentRound = userLiquidityPoolData.balanceCurrentRound > 0;
                     userLiquidityPoolData.hasDepositForNextRound = userLiquidityPoolData.balanceNextRound > 0;
-                    userLiquidityPoolData.maxDeposit = bigNumberFormmaterWithDecimals(
+                    userLiquidityPoolData.maxDeposit = bigNumberFormatter(
                         contractUserLiquidityPoolData.maxDeposit,
                         decimals
                     );
                     userLiquidityPoolData.stakedThales = bigNumberFormatter(contractUserLiquidityPoolData.stakedThales);
-                    userLiquidityPoolData.availableToDeposit = bigNumberFormmaterWithDecimals(
+                    userLiquidityPoolData.availableToDeposit = bigNumberFormatter(
                         contractUserLiquidityPoolData.availableToDeposit,
                         decimals
                     );

@@ -1,11 +1,10 @@
 import { useQuery, UseQueryOptions } from 'react-query';
 import QUERY_KEYS from '../../constants/queryKeys';
-import { bigNumberFormatter, bigNumberFormmaterWithDecimals } from 'utils/formatters/ethers';
+import { bigNumberFormatter, getDefaultDecimalsForNetwork } from 'thales-utils';
 import networkConnector from 'utils/networkConnector';
 import { Network } from 'enums/network';
 import { VaultData } from 'types/vault';
 import { isParlayVault } from 'constants/vault';
-import { getDefaultDecimalsForNetwork } from 'utils/network';
 
 const useVaultDataQuery = (
     vaultAddress: string,
@@ -50,18 +49,18 @@ const useVaultDataQuery = (
                         : await sportVaultDataContract.getSportVaultData(vaultAddress);
 
                     vaultData.vaultStarted = contractVaultData.vaultStarted;
-                    vaultData.maxAllowedDeposit = bigNumberFormmaterWithDecimals(
+                    vaultData.maxAllowedDeposit = bigNumberFormatter(
                         contractVaultData.maxAllowedDeposit,
                         getDefaultDecimalsForNetwork(networkId)
                     );
                     vaultData.round = Number(contractVaultData.round);
                     vaultData.roundEndTime = Number(contractVaultData.roundEndTime) * 1000;
-                    vaultData.availableAllocationNextRound = bigNumberFormmaterWithDecimals(
+                    vaultData.availableAllocationNextRound = bigNumberFormatter(
                         contractVaultData.availableAllocationNextRound,
                         getDefaultDecimalsForNetwork(networkId)
                     );
                     vaultData.isRoundEnded = new Date().getTime() > vaultData.roundEndTime;
-                    vaultData.minDepositAmount = bigNumberFormmaterWithDecimals(
+                    vaultData.minDepositAmount = bigNumberFormatter(
                         contractVaultData.minDepositAmount,
                         getDefaultDecimalsForNetwork(networkId)
                     );
@@ -77,17 +76,14 @@ const useVaultDataQuery = (
                         ? bigNumberFormatter(contractVaultData.maxTradeRate)
                         : bigNumberFormatter(contractVaultData.allocationLimitsPerMarketPerRound) / 100;
                     vaultData.minTradeAmount = isParlayVault(vaultAddress, networkId)
-                        ? bigNumberFormmaterWithDecimals(
-                              contractVaultData.minTradeAmount,
-                              getDefaultDecimalsForNetwork(networkId)
-                          )
+                        ? bigNumberFormatter(contractVaultData.minTradeAmount, getDefaultDecimalsForNetwork(networkId))
                         : bigNumberFormatter(contractVaultData.minTradeAmount);
                     vaultData.roundLength = Number(contractVaultData.roundLength) / 60 / 60 / 24;
-                    vaultData.allocationCurrentRound = bigNumberFormmaterWithDecimals(
+                    vaultData.allocationCurrentRound = bigNumberFormatter(
                         contractVaultData.allocationCurrentRound,
                         getDefaultDecimalsForNetwork(networkId)
                     );
-                    vaultData.allocationNextRound = bigNumberFormmaterWithDecimals(
+                    vaultData.allocationNextRound = bigNumberFormatter(
                         contractVaultData.allocationNextRound,
                         getDefaultDecimalsForNetwork(networkId)
                     );
@@ -97,12 +93,12 @@ const useVaultDataQuery = (
                         bigNumberFormatter(contractVaultData.lifetimePnl) === 0
                             ? 0
                             : bigNumberFormatter(contractVaultData.lifetimePnl) - 1;
-                    vaultData.allocationSpentInARound = bigNumberFormmaterWithDecimals(
+                    vaultData.allocationSpentInARound = bigNumberFormatter(
                         contractVaultData.allocationSpentInARound,
                         getDefaultDecimalsForNetwork(networkId)
                     );
                     vaultData.availableAllocationInARound =
-                        bigNumberFormmaterWithDecimals(
+                        bigNumberFormatter(
                             contractVaultData.tradingAllocation,
                             getDefaultDecimalsForNetwork(networkId)
                         ) - vaultData.allocationSpentInARound;

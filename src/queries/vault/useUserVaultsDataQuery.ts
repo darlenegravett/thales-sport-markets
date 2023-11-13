@@ -1,11 +1,10 @@
 import { useQuery, UseQueryOptions } from 'react-query';
 import QUERY_KEYS from '../../constants/queryKeys';
-import { bigNumberFormmaterWithDecimals } from 'utils/formatters/ethers';
+import { bigNumberFormatter, getDefaultDecimalsForNetwork } from 'thales-utils';
 import networkConnector from 'utils/networkConnector';
 import { Network } from 'enums/network';
 import { UserVaultsData } from 'types/vault';
 import { VAULT_MAP, isParlayVault } from 'constants/vault';
-import { getDefaultDecimalsForNetwork } from 'utils/network';
 
 const useUserVaultsDataQuery = (
     walletAddress: string,
@@ -35,11 +34,11 @@ const useUserVaultsDataQuery = (
 
                         userVaultData.balanceTotal += contractUserVaultData.withdrawalRequested
                             ? 0
-                            : bigNumberFormmaterWithDecimals(
+                            : bigNumberFormatter(
                                   contractUserVaultData.balanceCurrentRound,
                                   getDefaultDecimalsForNetwork(networkId)
                               ) +
-                              bigNumberFormmaterWithDecimals(
+                              bigNumberFormatter(
                                   contractUserVaultData.balanceNextRound,
                                   getDefaultDecimalsForNetwork(networkId)
                               );

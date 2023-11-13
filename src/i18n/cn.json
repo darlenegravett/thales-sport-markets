@@ -21,7 +21,9 @@
             "approve": "批准",
             "get-usd-progress": "铸造 {{amount}}...",
             "disclaimer": "By connecting a wallet you acknowledge that you have read and understand the Overtime Markets <disclaimer>disclaimer</disclaimer> and agree to its <terms>Terms of Use</terms>.",
-            "wallet-info": "钱包信息"
+            "wallet-info": "钱包信息",
+            "approve-parlay": "批准 ParlayAMM",
+            "approve-sports": "批准 SportsAMM"
         },
         "voucher": {
             "remaining-amount": "余额",
@@ -71,7 +73,10 @@
             "approve-label": "批准 {{currencyKey}}",
             "approve-progress-label": "批准 {{currencyKey}} 进行中...",
             "approve-all-label": "批准所有",
-            "custom-amount-label": "批准指定数量"
+            "custom-amount-label": "批准指定数量",
+            "approve-swap": "批准兑换为 {{currencyKey}}",
+            "approve-progress": "正在批准...",
+            "approve": "批准"
         },
         "unsupported-network": {
             "title": "Overtime不支持当前连接的网络!",
@@ -277,7 +282,8 @@
         "race-starts": "比赛开始",
         "back": "后退",
         "apply-filters": "应用过滤器",
-        "incentivized-market": "激励市场"
+        "incentivized-market": "激励市场",
+        "number-of-rounds": "总轮数"
     },
     "markets": {
         "market-card": {
@@ -306,13 +312,25 @@
                 "passing yards": "传球码数",
                 "rushing yards": "冲码",
                 "passing touchdowns": "传球达阵",
-                "strikeouts": "三振"
+                "strikeouts": "三振",
+                "scoring touchdown": "谁将在比赛中达阵得分？",
+                "field goals made": "射门得分",
+                "pitcher hits allowed": "允许投手击球",
+                "points": "积分",
+                "shots": "镜头",
+                "goals": "谁会在比赛中进球？",
+                "hits recorded": "点击记录",
+                "assists": "助攻",
+                "rebounds": "篮板球",
+                "triple double": "三双",
+                "double double": "双双"
             },
             "odd-tooltip": {
                 "scoring": {
                     "goals": "goals",
                     "points": "points",
-                    "sets": "套"
+                    "sets": "套",
+                    "rounds": "回合"
                 },
                 "match-resolve": {
                     "regular": "in regular time",
@@ -348,7 +366,30 @@
                     "rushing-yards-under": "{{team}} 的冲球码数将少于 {{scoring}}",
                     "strikeouts-under": "{{team}} 的三振次数将少于 {{scoring}}",
                     "receiving-yards-under": "{{team}} 的接球码数将少于 {{scoring}}",
-                    "passing-yards-under": "{{team}} 的传球码数将少于 {{scoring}}"
+                    "passing-yards-under": "{{team}} 的传球码数将少于 {{scoring}}",
+                    "touchdowns": "{{team}} 将在比赛中达阵得分",
+                    "field-goals-made-under": "{{team}} 的射门得分将少于 {{scoring}}",
+                    "field-goals-made-over": "{{team}} 的射门数将多于 {{scoring}}",
+                    "info": {
+                        "scoring touchdown": "接球、冲球、弃踢回攻、踢回攻、防守和拦截达阵均计入结果"
+                    },
+                    "pitcher-hits-allowed-over": "{{team}} 允许的命中数将多于 {{scoring}}",
+                    "pitcher-hits-allowed-under": "{{team}} 允许的命中数将少于 {{scoring}}",
+                    "points-over": "{{team}} 将比 {{scoring}} 获得更多分数",
+                    "goals": "{{team}} 将在比赛中进球",
+                    "shots-over": "{{team}} 的射门次数将多于 {{scoring}}",
+                    "points-under": "{{team}} 的得分将低于 {{scoring}}",
+                    "shots-under": "{{team}} 的射门次数将少于 {{scoring}}",
+                    "hits-recorded-under": "{{team}} 记录的命中数将少于 {{scoring}}",
+                    "hits-recorded-over": "{{team}} 记录的命中数将多于 {{scoring}}",
+                    "assists-over": "{{team}} 的助攻数将多于 {{scoring}}",
+                    "rebounds-over": "{{team}} 的篮板数将多于 {{scoring}}",
+                    "rebounds-under": "{{team}} 的篮板数将少于 {{scoring}}",
+                    "assists-under": "{{team}} 的助攻数将少于 {{scoring}}",
+                    "double-double-yes": "{{team}} 将得分两双",
+                    "double-double-no": "{{team}} 不会得分两双",
+                    "triple-double-yes": "{{team}}将获得三双",
+                    "triple-double-no": "{{team}}不会拿下三双"
                 }
             },
             "starts-in": "开始于",
@@ -363,7 +404,8 @@
             "race-winner": "优胜者",
             "see-more-markets": "查看玩家道具市场",
             "see-more-markets-mobile": "玩家道具",
-            "player-props": "玩家道具"
+            "player-props": "玩家道具",
+            "resolved": "解决"
         },
         "market-details": {
             "price": "价格",
@@ -412,7 +454,10 @@
                 "max-combined-markets": "Parlay 中组合市场的最大数量为 {{max}}。",
                 "amm-contract-paused": "连本带利 AMM 已暂停",
                 "unique-players": "不能在连赢中添加同一参与者两次。 {{existingParticipant}} 已加入连本带利",
-                "same-event-participant": "每个活动仅支持一名参与者。无法添加 {{addedParticipant}}，因为 {{existingParticipant}} 已在连本带利中"
+                "same-event-participant": "每个活动仅支持一名参与者。无法添加 {{addedParticipant}}，因为 {{existingParticipant}} 已在连本带利中",
+                "same-game-different-player-props": "不支持组合不同类别的玩家道具",
+                "player-props-and-other-positions": "不支持将玩家道具位置与同一市场的其他位置组合起来",
+                "already-added-combined-positions": "不能将同一市场的头寸与合并头寸合并"
             },
             "empty-description": "添加头寸，选择市场并做出选择。",
             "payout": "收到的总数",
@@ -448,7 +493,10 @@
             "toggle-parlay": {
                 "multi-single": "单身的",
                 "parlay": "过关"
-            }
+            },
+            "in-wallet": "在钱包里",
+            "total-to-pay": "总共支付",
+            "pay-with-voucher": "使用优惠券付款"
         },
         "discounted-per": "折扣按",
         "nav-menu": {
@@ -607,7 +655,10 @@
             "result": "结果",
             "starts": "开始",
             "position-size": "仓位大小",
-            "claim-all": "索取全部"
+            "claim-all": "索取全部",
+            "approve-swap-tooltip": "要以 {{currencyKey}} 付款，您需要批准从 {{defaultCurrency}} 兑换为 {{currencyKey}}。",
+            "payout-in": "付款于",
+            "claim-progress": "声称..."
         },
         "messages": {
             "no-claimable": "您没有任何可申请的职位",
@@ -828,7 +879,8 @@
             "period-end-label": "The period ends in",
             "period-ended-label": "Period ended",
             "bi-weekly-period": "Bi-weekly period"
-        }
+        },
+        "warning2": "覆盖中奖彩票潜在组合 50% 或以上的用户将被取消资格。"
     },
     "wizard": {
         "title": "Get Started!",
@@ -955,5 +1007,39 @@
         "single-lp": "单张唱片",
         "description-parlay": "<h1>描述</h1><p>流动性提供涉及用户将稳定币抵押品存入基于智能合约的流动性池中以进行加班交易。存入的抵押品用于促进 Overtime 的 Parlay AMM 上的交易。</p><p>为了能够提供流动性，您需要质押泰雷兹。每个钱包没有最高限额，每质押 {{thalesStakedAmount}} THALES 最多可存入 1 {{currency}}，直至流动资金池填满。</p><p>每轮结束时，该轮盈亏的比例份额将添加到您的存入余额中。</p><p>如果您希望提款，您可以在正在进行的回合中随时发出信号，并在该回合结束时，您发出的提款金额（包括该轮的盈亏）将发送给您。最低提款金额设定为10%</p><p>如果您决定在提供流动性的同时解除泰雷兹质押，请注意，您需要首先发出从流动性池中提款的信号。</p><p>提供流动性会让您面临各种风险，包括用户在交易中获胜造成的潜在损失以及智能合约安全风险。请确保您在存款前了解这些风险。</p><p><tipLink> TIP-142</tipLink>有关加班流动性提供的技术实施的更多详细信息。</p>",
         "parlay-lp": "连本带利LP"
+    },
+    "seo": {
+        "home": {
+            "description": "进入顶级链上 web3 体育博彩的世界。在超过 12 个体育项目和超过 40 个联赛中获得席位。",
+            "title": "加时赛市场：顶级 Web3 体育博彩"
+        },
+        "markets": {
+            "description": "加入市场上最好的 web3 体育博彩。确保在 NFL、NBA、UCL、EPL 等顶级联赛中的位置。",
+            "title": "加时赛市场： 40 多个联赛的 Web3 体育博彩市场"
+        },
+        "vaults": {
+            "title": "加班市场金库：自动交易",
+            "description": "将资产存入 Overtime Markets 金库，让我们的自动交易机制部署您选择的策略。"
+        },
+        "parlay-leaderboard": {
+            "title": "加班市场：每两周赚取过关奖励",
+            "description": "Overtime Markets 是一家 web3 体育博彩网站，为连赢彩玩家提供市场上最好的双周奖金！在这里查看排行榜以及您是否符合资格。"
+        },
+        "referral": {
+            "title": "加班市场：赚取推荐费",
+            "description": "推荐朋友加入 Overtime Markets，并从您推荐的人的每笔交易中获得一定比例的佣金，并以美元抵押品立即直接存入您的钱包。"
+        },
+        "profile": {
+            "title": "加班市场：用户概况",
+            "description": "领取您的奖金、查看您的表现并跟踪您在加班市场金库中的存款。"
+        },
+        "liquidity-pool": {
+            "title": "加班市场：成为我们流动资金池的主人",
+            "description": "成为加班市场之家！将稳定币抵押品存入流动性池，每周就有机会赚取一定比例的损益。"
+        },
+        "single-market": {
+            "title": "加时赛市场 Web3 体育博彩：{{dynamicTitle}}",
+            "description": "{{dynamicTitle}}：享受市场上最好的 Web3 体育博彩赔率。无需注册。完全去中心化的体育市场。"
+        }
     }
 }
